@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:english_test_app/%20pages/result_page.dart';
+import 'package:english_test_app/%20pages/voicechoicequestion_page.dart';
 import 'package:english_test_app/model/question_model.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -64,7 +65,9 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
         // 結果ページへ遷移するコード
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => ResultPage(scoreModel: widget.scoreModel),
+            builder: (context) => VoiceChoiceQuestionPage(
+              title: 'voicechoice',
+              scoreModel: widget.scoreModel,),
           ),
         );
       });
@@ -81,7 +84,6 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
 
   @override
   Widget build(BuildContext context) {
-    print("DictationQuestionPageでのScoreModelのhashCode: ${widget.scoreModel.hashCode}");
     if (questionList.isEmpty) {
       return Scaffold(
         body: Center(
@@ -99,7 +101,7 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (result != null) Text('結果: $result'),
-            Text('問題 ${currentQuestionIndex + 1}'),
+            const Text('音声を文字起こししてください'),
             TextButton(
               onPressed: () {
                 playAudio(question.audioUrl);
@@ -124,4 +126,3 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
     );
   }
 }
-

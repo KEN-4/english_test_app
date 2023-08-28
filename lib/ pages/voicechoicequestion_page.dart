@@ -1,23 +1,26 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:english_test_app/%20pages/dictation_page.dart';
+import 'package:english_test_app/%20pages/result_page.dart';
 import 'package:english_test_app/model/question_model.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:english_test_app/model/score_model.dart';
 
-class L2QuestionPage extends StatefulWidget {
-  const L2QuestionPage({super.key, required this.title});
+class VoiceChoiceQuestionPage extends StatefulWidget {
+  const VoiceChoiceQuestionPage({Key? key, required this.title, required this.scoreModel}): super(key: key);
 
   final String title;
+  final ScoreModel scoreModel;
 
   @override
-  State<L2QuestionPage> createState() => _L2QuestionPageState();
+  State<VoiceChoiceQuestionPage> createState() => _VoiceChoiceQuestionPageState();
 }
 
-class _L2QuestionPageState extends State<L2QuestionPage> {
+class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
   List<Question> questionList = [];
   AudioPlayer audioPlayer = AudioPlayer();
+
 
   Future<void> playAudio(String storageUrl) async {
     final String downloadUrl =
@@ -27,7 +30,7 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
 
   void fetchQuestion() async {
     final questionCollection =
-        await FirebaseFirestore.instance.collection('listening_2choice').get();
+        await FirebaseFirestore.instance.collection('voicechoice').get();
     final docs = questionCollection.docs;
     for (var doc in docs) {
       Question question = Question.fromMap(doc.data());
@@ -51,7 +54,7 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
     if (question.correctAnswer == selectedChoice) {
       result = '○';
       for (String skill in question.skills) {
-        scoreModel.addScore(skill);
+        widget.scoreModel.addScore(skill);
       }
     } else {
       result = '×';
@@ -65,7 +68,7 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => DictationQuestionPage(scoreModel: this.scoreModel)),
+              builder: (context) => ResultPage(scoreModel: widget.scoreModel)),
         );
       });
     } else {
@@ -81,7 +84,6 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
 
   @override
   Widget build(BuildContext context) {
-    print("L2QuestionPageでのScoreModelのhashCode: ${scoreModel.hashCode}");
     if (questionList.isEmpty) {
       return Scaffold(
         body: Center(
@@ -95,12 +97,11 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
         title: Text(widget.title),
       ),
       body: Center(
-        // これでボタンなどが中央に配置されます
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center, // これで要素が中央に来ます
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (result != null) Text('結果: $result'),
-            const Text('発音した単語を選んでください'),
+            const Text('音声に合う選択肢を選んでください'),
             TextButton(
               onPressed: () {
                 playAudio(question.audioUrl);

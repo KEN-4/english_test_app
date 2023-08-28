@@ -4,9 +4,10 @@ class Question {
   final String correctAnswer;
   final String type;
   final List<String> skills;
+  final List<String> sentences;
 
   Question(
-      this.audioUrl, this.choices, this.correctAnswer, this.type, this.skills);
+      this.audioUrl, this.choices, this.correctAnswer, this.type, this.skills , this.sentences);
 
   // fromMap ファクトリーコンストラクタ
   factory Question.fromMap(Map<String, dynamic> map) {
@@ -16,6 +17,7 @@ class Question {
       map['correctAnswer'] ?? '',
       map['type'] ?? '',
       map['skills'] == null ? [] : List<String>.from(map['skills']),
+      map['sentences'] == null ? [] : List<String>.from(map['sentences']),
     );
   }
 }
