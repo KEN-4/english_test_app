@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:english_test_app/%20pages/conversationquestion_page.dart';
 import 'package:english_test_app/%20pages/dictation_page.dart';
 import 'package:english_test_app/%20pages/result_page.dart';
 import 'package:english_test_app/model/question_model.dart';
@@ -65,10 +66,13 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
     if (currentQuestionIndex >= questionList.length - 1) {
       Future.delayed(Duration(seconds: 2), () {
         // 2秒待つ
-        Navigator.push(
-          context,
+        // 結果ページへ遷移するコード
+        Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-              builder: (context) => ResultPage(scoreModel: widget.scoreModel)),
+            builder: (context) => ConversationQuestionPage(
+              title: 'conversation',
+              scoreModel: widget.scoreModel,),
+          ),
         );
       });
     } else {
