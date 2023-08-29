@@ -1,12 +1,13 @@
 class ScoreModel {
-  Map<String, int> scores = {
-    'listening': 0,
-    'speaking': 0,
-    'grammar': 0,
-    'vocabulary': 0,
+  Map<String, double> scores = {
+    'listening': 0.0,
+    'speaking': 0.0,
+    'grammar': 0.0,
+    'vocabulary': 0.0,
   };
 
-  void addScore(String skill) {
-    scores[skill] = (scores[skill] ?? 0) + 1;
+  void addScore(String skill, {double additionalScore = 1.0}) {
+    scores[skill] = (scores[skill] ?? 0.0) + additionalScore;
+    print("Score for $skill after adding: ${scores[skill]}");
   }
 }

@@ -1,5 +1,4 @@
 import 'package:audioplayers/audioplayers.dart';
-import 'package:english_test_app/%20pages/result_page.dart';
 import 'package:english_test_app/%20pages/voicechoicequestion_page.dart';
 import 'package:english_test_app/model/question_model.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +42,6 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
   @override
   void initState() {
     super.initState();
-    print('Initial score in DictationQuestionPage: ${widget.scoreModel.scores}');
     fetchQuestion();
   }
 
@@ -51,7 +49,7 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
     if (question.correctAnswer == textController.text.trim()) {
       result = '○';
       for (String skill in question.skills) {
-        widget.scoreModel.addScore(skill);
+        widget.scoreModel.addScore(skill, additionalScore: question.score);
       }
     } else {
       result = '×';

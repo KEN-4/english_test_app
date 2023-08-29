@@ -55,7 +55,7 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
     if (question.correctAnswer == selectedChoice) {
       result = '○';
       for (String skill in question.skills) {
-        widget.scoreModel.addScore(skill);
+        widget.scoreModel.addScore(skill, additionalScore: question.score);
       }
     } else {
       result = '×';

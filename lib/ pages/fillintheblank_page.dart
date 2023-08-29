@@ -43,7 +43,7 @@ class _FillBlankPageState extends State<FillBlankPage> {
     if (question.answers.contains(textController.text.trim())) {
       result = '○';
       for (String skill in question.skills) {
-        widget.scoreModel.addScore(skill);
+        widget.scoreModel.addScore(skill, additionalScore: question.score);
       }
     } else {
       result = '×';

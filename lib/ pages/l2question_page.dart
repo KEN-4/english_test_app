@@ -7,10 +7,11 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:english_test_app/model/score_model.dart';
 
 class L2QuestionPage extends StatefulWidget {
-  const L2QuestionPage({super.key, required this.title});
+  const L2QuestionPage({super.key, required this.title, required this.scoreModel});
 
   final String title;
-
+  final ScoreModel scoreModel;
+  
   @override
   State<L2QuestionPage> createState() => _L2QuestionPageState();
 }
@@ -45,13 +46,11 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
   int currentQuestionIndex = 0;
   String? result;
 
-  final scoreModel = ScoreModel();
-
   void checkAnswer(Question question, String selectedChoice) {
     if (question.correctAnswer == selectedChoice) {
       result = '○';
       for (String skill in question.skills) {
-        scoreModel.addScore(skill);
+        widget.scoreModel.addScore(skill, additionalScore: question.score);
       }
     } else {
       result = '×';
@@ -65,7 +64,7 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => DictationQuestionPage(scoreModel: this.scoreModel)),
+              builder: (context) => DictationQuestionPage(scoreModel: widget.scoreModel)),  // widget.scoreModelを渡す
         );
       });
     } else {
@@ -81,7 +80,6 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
 
   @override
   Widget build(BuildContext context) {
-    print("L2QuestionPageでのScoreModelのhashCode: ${scoreModel.hashCode}");
     if (questionList.isEmpty) {
       return Scaffold(
         body: Center(

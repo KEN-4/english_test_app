@@ -1,4 +1,5 @@
 import 'package:english_test_app/%20pages/l2question_page.dart';
+import 'package:english_test_app/model/score_model.dart';
 import 'package:flutter/material.dart';
 
 class TopPage extends StatelessWidget {
@@ -11,17 +12,21 @@ class TopPage extends StatelessWidget {
       ),
       body: Center(
         child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
+            onPressed: () {
+              ScoreModel scoreModel = ScoreModel(); // ここでScoreModelのインスタンスを作成
+              Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => L2QuestionPage(
-                    title: 'Listning Page',
+                    title: 'Listening Page',
+                    scoreModel: scoreModel, // そしてここで渡す
                   ),
-                ));
-          },
-          child: Text('診断開始'),
-        ),
+                ),
+              );
+            },
+            child: Text('診断開始'),
+          ),
+
       ),
     );
   }
