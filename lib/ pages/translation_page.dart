@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:english_test_app/%20pages/choicequestion_page.dart';
 import 'package:english_test_app/%20pages/result_page.dart';
 import 'package:english_test_app/model/question_model.dart';
 import 'package:flutter/material.dart';
@@ -53,10 +54,11 @@ class _TranslationPageState extends State<TranslationPage> {
 
     if (currentQuestionIndex >= questionList.length - 1) {
       Future.delayed(Duration(seconds: 2), () {
-        Navigator.push(
-          context,
+        Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => ResultPage(scoreModel: widget.scoreModel),
+            builder: (context) => ChoiceQuestionPage(
+              title: 'choice',
+              scoreModel: widget.scoreModel,),
           ),
         );
       });

@@ -7,8 +7,6 @@ class ScoreModel {
   };
 
   void addScore(String skill) {
-    print('Adding score for skill: $skill');
     scores[skill] = (scores[skill] ?? 0) + 1;
-    print("Score for $skill after adding: ${scores[skill]}");
   }
 }
