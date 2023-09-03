@@ -19,7 +19,14 @@ class VoiceChoiceQuestionPage extends StatefulWidget {
 class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
   List<Question> questionList = [];
   AudioPlayer audioPlayer = AudioPlayer();
+  int currentQuestionIndex = 0;
+  String? result;
 
+  @override
+  void initState() {
+    super.initState();
+    fetchQuestion();
+  }
 
   Future<void> playAudio(String storageUrl) async {
     final String downloadUrl =
@@ -27,7 +34,7 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
     await audioPlayer.play(downloadUrl);
   }
 
-  void fetchQuestion() async {
+  Future<void> fetchQuestion() async {
     final questionCollection =
         await FirebaseFirestore.instance.collection('voicechoice').get();
     final docs = questionCollection.docs;
@@ -38,16 +45,28 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
     setState(() {});
   }
 
-  @override
-  void initState() {
-    super.initState();
-    fetchQuestion();
+  void navigateToNextPage() {
+    Future.delayed(Duration(seconds: 2), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ConversationQuestionPage(
+              title: 'conversation',
+              scoreModel: widget.scoreModel,
+            )
+        ),
+      );
+    });
   }
 
-  int currentQuestionIndex = 0;
-  String? result;
-
-  final scoreModel = ScoreModel();
+  void goToNextQuestion() {
+    Future.delayed(Duration(seconds: 2), () {
+      setState(() {
+        currentQuestionIndex++;
+        result = null;
+      });
+    });
+  }
 
   void checkAnswer(Question question, String selectedChoice) {
     if (question.correctAnswer == selectedChoice) {
@@ -62,25 +81,9 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
     setState(() {});
 
     if (currentQuestionIndex >= questionList.length - 1) {
-      Future.delayed(Duration(seconds: 2), () {
-        // 2秒待つ
-        // 結果ページへ遷移するコード
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => ConversationQuestionPage(
-              title: 'conversation',
-              scoreModel: widget.scoreModel,),
-          ),
-        );
-      });
+      navigateToNextPage();
     } else {
-      Future.delayed(Duration(seconds: 2), () {
-        // 2秒待つ
-        setState(() {
-          currentQuestionIndex++;
-          result = null;
-        });
-      });
+      goToNextQuestion();
     }
   }
 

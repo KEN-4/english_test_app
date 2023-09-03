@@ -23,20 +23,30 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
   TextEditingController textController = TextEditingController();
 
   Future<void> playAudio(String storageUrl) async {
-    final String downloadUrl =
-        await FirebaseStorage.instance.refFromURL(storageUrl).getDownloadURL();
-    await audioPlayer.play(downloadUrl);
+    try {
+      final String downloadUrl =
+          await FirebaseStorage.instance.refFromURL(storageUrl).getDownloadURL();
+      await audioPlayer.play(downloadUrl);
+    } catch (e) {
+      // handle the error here
+      print("Error while playing audio: $e");
+    }
   }
 
   void fetchQuestion() async {
-    final questionCollection =
-        await FirebaseFirestore.instance.collection('dictation').get();
-    final docs = questionCollection.docs;
-    for (var doc in docs) {
-      Question question = Question.fromMap(doc.data());
-      questionList.add(question);
+    try {
+      final questionCollection =
+          await FirebaseFirestore.instance.collection('dictation').get();
+      final docs = questionCollection.docs;
+      for (var doc in docs) {
+        Question question = Question.fromMap(doc.data());
+        questionList.add(question);
+      }
+      setState(() {});
+    } catch (e) {
+      // handle the error here
+      print("Error while fetching questions: $e");
     }
-    setState(() {});
   }
 
   @override
@@ -58,26 +68,32 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
     textController.clear();
 
     if (currentQuestionIndex >= questionList.length - 1) {
-      Future.delayed(Duration(seconds: 2), () {
-        // 2秒待つ
-        // 結果ページへ遷移するコード
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
+      navigateToNextPage();
+    } else {
+      goToNextQuestion();
+    }
+  }
+
+  void navigateToNextPage() {
+    Future.delayed(Duration(seconds: 2), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
             builder: (context) => VoiceChoiceQuestionPage(
               title: 'voicechoice',
               scoreModel: widget.scoreModel,),
-          ),
-        );
+        ),
+      );
+    });
+  }
+
+  void goToNextQuestion() {
+    Future.delayed(Duration(seconds: 2), () {
+      setState(() {
+        currentQuestionIndex++;
+        result = null;
       });
-    } else {
-      Future.delayed(Duration(seconds: 2), () {
-        // 2秒待つ
-        setState(() {
-          currentQuestionIndex++;
-          result = null;
-        });
-      });
-    }
+    });
   }
 
   @override

@@ -15,11 +15,16 @@ class ResultPage extends StatelessWidget {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text('Listening Score: ${scoreModel.scores['listening'] ?? 0}'),
-            Text('Speaking Score: ${scoreModel.scores['speaking'] ?? 0}'),
-            Text('Grammar Score: ${scoreModel.scores['grammar'] ?? 0}'),
-            Text('Vocabulary Score: ${scoreModel.scores['vocabulary'] ?? 0}'),
+          children: [
+            ...scoreModel.scores.keys.map((key) {
+              return Text(
+                '$key Score: ${scoreModel.scores[key] ?? 0}',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              );
+            }).toList(),
           ],
         ),
       ),

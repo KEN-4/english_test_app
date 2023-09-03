@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:english_test_app/pages/choicequestion_page.dart';
-import 'package:english_test_app/pages/result_page.dart';
 import 'package:english_test_app/model/question_model.dart';
 import 'package:flutter/material.dart';
 import 'package:english_test_app/model/score_model.dart';
@@ -22,9 +21,14 @@ class _TranslationPageState extends State<TranslationPage> {
   String? result;
   TextEditingController textController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    fetchQuestion();
+  }
+
   void fetchQuestion() async {
-    final questionCollection =
-        await FirebaseFirestore.instance.collection('translation').get();
+    final questionCollection = await FirebaseFirestore.instance.collection('translation').get();
     final docs = questionCollection.docs;
     for (var doc in docs) {
       Question question = Question.fromMap(doc.data());
@@ -33,10 +37,25 @@ class _TranslationPageState extends State<TranslationPage> {
     setState(() {});
   }
 
-  @override
-  void initState() {
-    super.initState();
-    fetchQuestion();
+  void navigateToNextPage() {
+    Future.delayed(Duration(seconds: 2), () {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => ChoiceQuestionPage(
+            title: 'choice',
+            scoreModel: widget.scoreModel,),
+        ),
+      );
+    });
+  }
+
+  void goToNextQuestion() {
+    Future.delayed(Duration(seconds: 2), () {
+      setState(() {
+        currentQuestionIndex++;
+        result = null;
+      });
+    });
   }
 
   void checkAnswer(Question question) {
@@ -48,32 +67,19 @@ class _TranslationPageState extends State<TranslationPage> {
     } else {
       result = '×';
     }
-
+    
     setState(() {});
     textController.clear();
 
     if (currentQuestionIndex >= questionList.length - 1) {
-      Future.delayed(Duration(seconds: 2), () {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => ChoiceQuestionPage(
-              title: 'choice',
-              scoreModel: widget.scoreModel,),
-          ),
-        );
-      });
+      navigateToNextPage();
     } else {
-      Future.delayed(Duration(seconds: 2), () {
-        setState(() {
-          currentQuestionIndex++;
-          result = null;
-        });
-      });
+      goToNextQuestion();
     }
   }
 
-void addChoiceToTextField(String choice) {
-    textController.text = textController.text + ' ' + choice;  // スペースを追加して新しい単語を追加
+  void addChoiceToTextField(String choice) {
+    textController.text = textController.text + ' ' + choice;
   }
 
   @override
@@ -83,7 +89,7 @@ void addChoiceToTextField(String choice) {
     }
     var question = questionList[currentQuestionIndex];
     return Scaffold(
-      appBar: AppBar(title: Text('Translation Question')),
+      appBar: AppBar(title: Text(widget.title)),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

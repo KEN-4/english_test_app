@@ -18,8 +18,13 @@ class _ConversationQuestionPageState extends State<ConversationQuestionPage> {
   List<Question> questionList = [];
   int currentQuestionIndex = 0;
   String? result;
-  final scoreModel = ScoreModel();
-  
+
+  @override
+  void initState() {
+    super.initState();
+    fetchQuestion();
+  }
+
   void fetchQuestion() async {
     final questionCollection =
         await FirebaseFirestore.instance.collection('conversation').get();
@@ -31,12 +36,28 @@ class _ConversationQuestionPageState extends State<ConversationQuestionPage> {
     setState(() {});
   }
 
-  @override
-  void initState() {
-    super.initState();
-    fetchQuestion();
+  void navigateToNextPage() {
+    Future.delayed(Duration(seconds: 2), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => FillBlankPage(
+              title: 'voicechoice',
+              scoreModel: widget.scoreModel,
+            )
+        ),
+      );
+    });
   }
 
+  void goToNextQuestion() {
+    Future.delayed(Duration(seconds: 2), () {
+      setState(() {
+        currentQuestionIndex++;
+        result = null;
+      });
+    });
+  }
 
   void checkAnswer(Question question, String selectedChoice) {
     if (question.correctAnswer == selectedChoice) {
@@ -51,24 +72,9 @@ class _ConversationQuestionPageState extends State<ConversationQuestionPage> {
     setState(() {});
 
     if (currentQuestionIndex >= questionList.length - 1) {
-      Future.delayed(Duration(seconds: 2), () {
-        // 2秒待つ
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => FillBlankPage(
-              title: 'voicechoice',
-              scoreModel: widget.scoreModel,),
-          ),
-        );
-      });
+      navigateToNextPage();
     } else {
-      Future.delayed(Duration(seconds: 2), () {
-        // 2秒待つ
-        setState(() {
-          currentQuestionIndex++;
-          result = null;
-        });
-      });
+      goToNextQuestion();
     }
   }
 
@@ -79,23 +85,22 @@ class _ConversationQuestionPageState extends State<ConversationQuestionPage> {
     }
     var question = questionList[currentQuestionIndex];
     return Scaffold(
-    appBar: AppBar(title: Text('Conversation Question')),
-    body: Center(
-     child: Column(
-       mainAxisAlignment: MainAxisAlignment.center,
-       children: [
-         if (result != null) Text('Result: $result'),  
-         ...question.sentences.map((sentence) => Text(sentence)).toList(), 
-         ...List.generate(question.choices.length, (index) {
-          return ElevatedButton(
-            onPressed: () => checkAnswer(question , question.choices[index]),
-            child: Text(question.choices[index]),
-          );
-        }),
-      ],
-    ),
-  ),
-);
-
+      appBar: AppBar(title: Text(widget.title)),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (result != null) Text('Result: $result'),
+            ...question.sentences.map((sentence) => Text(sentence)).toList(),
+            ...List.generate(question.choices.length, (index) {
+              return ElevatedButton(
+                onPressed: () => checkAnswer(question, question.choices[index]),
+                child: Text(question.choices[index]),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
   }
 }

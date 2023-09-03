@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:english_test_app/pages/fillintheblank_page.dart';
 import 'package:english_test_app/pages/result_page.dart';
 import 'package:english_test_app/model/question_model.dart';
 import 'package:flutter/material.dart';
@@ -19,11 +18,9 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
   List<Question> questionList = [];
   int currentQuestionIndex = 0;
   String? result;
-  final scoreModel = ScoreModel();
   
   void fetchQuestion() async {
-    final questionCollection =
-        await FirebaseFirestore.instance.collection('choice').get();
+    final questionCollection = await FirebaseFirestore.instance.collection('choice').get();
     final docs = questionCollection.docs;
     for (var doc in docs) {
       Question question = Question.fromMap(doc.data());
@@ -38,6 +35,21 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
     fetchQuestion();
   }
 
+  void navigateToResultPage() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ResultPage(scoreModel: widget.scoreModel),
+      ),
+    );
+  }
+
+  void goToNextQuestion() {
+    setState(() {
+      currentQuestionIndex++;
+      result = null;
+    });
+  }
 
   void checkAnswer(Question question, String selectedChoice) {
     if (question.correctAnswer == selectedChoice) {
@@ -48,26 +60,13 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
     } else {
       result = '×';
     }
-
+    
     setState(() {});
 
     if (currentQuestionIndex >= questionList.length - 1) {
-      Future.delayed(Duration(seconds: 2), () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ResultPage(scoreModel: widget.scoreModel),
-          ),
-        );
-      });
+      Future.delayed(Duration(seconds: 2), navigateToResultPage);
     } else {
-      Future.delayed(Duration(seconds: 2), () {
-        // 2秒待つ
-        setState(() {
-          currentQuestionIndex++;
-          result = null;
-        });
-      });
+      Future.delayed(Duration(seconds: 2), goToNextQuestion);
     }
   }
 
@@ -78,23 +77,22 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
     }
     var question = questionList[currentQuestionIndex];
     return Scaffold(
-    appBar: AppBar(title: Text('Choice Question')),
-    body: Center(
-     child: Column(
-       mainAxisAlignment: MainAxisAlignment.center,
-       children: [
-         if (result != null) Text('Result: $result'),  
-         ...question.sentences.map((sentence) => Text(sentence)).toList(), 
-         ...List.generate(question.choices.length, (index) {
-          return ElevatedButton(
-            onPressed: () => checkAnswer(question , question.choices[index]),
-            child: Text(question.choices[index]),
-          );
-        }),
-      ],
-    ),
-  ),
-);
-
+      appBar: AppBar(title: Text(widget.title)),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (result != null) Text('Result: $result'),
+            ...question.sentences.map((sentence) => Text(sentence)).toList(),
+            ...List.generate(question.choices.length, (index) {
+              return ElevatedButton(
+                onPressed: () => checkAnswer(question , question.choices[index]),
+                child: Text(question.choices[index]),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
   }
 }
