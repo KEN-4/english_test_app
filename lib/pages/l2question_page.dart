@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:english_test_app/%20pages/dictation_page.dart';
+import 'package:english_test_app/pages/dictation_page.dart';
 import 'package:english_test_app/model/question_model.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -21,9 +21,14 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
   AudioPlayer audioPlayer = AudioPlayer();
 
   Future<void> playAudio(String storageUrl) async {
-    final String downloadUrl =
-        await FirebaseStorage.instance.refFromURL(storageUrl).getDownloadURL();
-    await audioPlayer.play(downloadUrl);
+    try {
+      final String downloadUrl =
+          await FirebaseStorage.instance.refFromURL(storageUrl).getDownloadURL();
+      await audioPlayer.play(downloadUrl);
+    } catch (e) {
+      // handle the error here
+      print("Error while playing audio: $e");
+    }
   }
 
   void fetchQuestion() async {
@@ -59,24 +64,31 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
     setState(() {});
 
     if (currentQuestionIndex >= questionList.length - 1) {
-      Future.delayed(Duration(seconds: 2), () {
-        // 2秒待つ
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => DictationQuestionPage(scoreModel: widget.scoreModel)),  // widget.scoreModelを渡す
-        );
-      });
+      navigateToNextPage();
     } else {
-      Future.delayed(Duration(seconds: 2), () {
-        // 2秒待つ
-        setState(() {
-          currentQuestionIndex++;
-          result = null;
-        });
-      });
+      goToNextQuestion();
     }
   }
+
+  void navigateToNextPage() {
+    Future.delayed(Duration(seconds: 2), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => DictationQuestionPage(scoreModel: widget.scoreModel)),
+      );
+    });
+  }
+
+  void goToNextQuestion() {
+    Future.delayed(Duration(seconds: 2), () {
+      setState(() {
+        currentQuestionIndex++;
+        result = null;
+      });
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -93,9 +105,8 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
         title: Text(widget.title),
       ),
       body: Center(
-        // これでボタンなどが中央に配置されます
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center, // これで要素が中央に来ます
+          mainAxisAlignment: MainAxisAlignment.center, 
           children: [
             if (result != null) Text('結果: $result'),
             const Text('発音した単語を選んでください'),

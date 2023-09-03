@@ -21,7 +21,7 @@ class Question {
       map['skills'] == null ? [] : List<String>.from(map['skills']),
       map['sentences'] == null ? [] : List<String>.from(map['sentences']),
       map['answers'] == null ? [] : List<String>.from(map['answers']),
-      map['score'] ?? 1.0,
+      map['score'] != null ? map['score'].toDouble() : 1.0,
     );
   }
 }

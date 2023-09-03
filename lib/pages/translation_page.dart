@@ -1,22 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:english_test_app/%20pages/result_page.dart';
-import 'package:english_test_app/%20pages/translation_page.dart';
+import 'package:english_test_app/pages/choicequestion_page.dart';
+import 'package:english_test_app/pages/result_page.dart';
 import 'package:english_test_app/model/question_model.dart';
 import 'package:flutter/material.dart';
 import 'package:english_test_app/model/score_model.dart';
 
-class FillBlankPage extends StatefulWidget {
-  const FillBlankPage({Key? key, required this.title, required this.scoreModel})
+class TranslationPage extends StatefulWidget {
+  const TranslationPage({Key? key, required this.title, required this.scoreModel})
       : super(key: key);
 
   final String title;
   final ScoreModel scoreModel;
 
   @override
-  State<FillBlankPage> createState() => _FillBlankPageState();
+  State<TranslationPage> createState() => _TranslationPageState();
 }
 
-class _FillBlankPageState extends State<FillBlankPage> {
+class _TranslationPageState extends State<TranslationPage> {
   List<Question> questionList = [];
   int currentQuestionIndex = 0;
   String? result;
@@ -24,7 +24,7 @@ class _FillBlankPageState extends State<FillBlankPage> {
 
   void fetchQuestion() async {
     final questionCollection =
-        await FirebaseFirestore.instance.collection('fillintheblank').get();
+        await FirebaseFirestore.instance.collection('translation').get();
     final docs = questionCollection.docs;
     for (var doc in docs) {
       Question question = Question.fromMap(doc.data());
@@ -40,7 +40,7 @@ class _FillBlankPageState extends State<FillBlankPage> {
   }
 
   void checkAnswer(Question question) {
-    if (question.answers.contains(textController.text.trim())) {
+    if (question.correctAnswer == textController.text.trim()) {
       result = '○';
       for (String skill in question.skills) {
         widget.scoreModel.addScore(skill, additionalScore: question.score);
@@ -56,23 +56,24 @@ class _FillBlankPageState extends State<FillBlankPage> {
       Future.delayed(Duration(seconds: 2), () {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => TranslationPage(
-              title: 'translation',
+            builder: (context) => ChoiceQuestionPage(
+              title: 'choice',
               scoreModel: widget.scoreModel,),
           ),
         );
       });
     } else {
       Future.delayed(Duration(seconds: 2), () {
-        if (mounted) {  // ウィジェットがマウントされているかどうか確認
-          setState(() {
-            currentQuestionIndex++;
-            result = null;
-          });
-        }
+        setState(() {
+          currentQuestionIndex++;
+          result = null;
+        });
       });
-
     }
+  }
+
+void addChoiceToTextField(String choice) {
+    textController.text = textController.text + ' ' + choice;  // スペースを追加して新しい単語を追加
   }
 
   @override
@@ -89,6 +90,12 @@ class _FillBlankPageState extends State<FillBlankPage> {
           children: [
             if (result != null) Text('Result: $result'),
             ...question.sentences.map((sentence) => Text(sentence)).toList(),
+            ...List.generate(question.choices.length, (index) {
+              return ElevatedButton(
+                onPressed: () => addChoiceToTextField(question.choices[index]),
+                child: Text(question.choices[index]),
+              );
+            }),
             TextField(
               controller: textController,
               decoration: InputDecoration(

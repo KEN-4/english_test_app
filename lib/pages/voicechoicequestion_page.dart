@@ -1,26 +1,25 @@
-import 'package:audioplayers/audioplayers.dart';
-import 'package:english_test_app/%20pages/voicechoicequestion_page.dart';
-import 'package:english_test_app/model/question_model.dart';
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:english_test_app/pages/conversationquestion_page.dart';
+import 'package:english_test_app/model/question_model.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:english_test_app/model/score_model.dart';
 
-class DictationQuestionPage extends StatefulWidget {
+class VoiceChoiceQuestionPage extends StatefulWidget {
+  const VoiceChoiceQuestionPage({Key? key, required this.title, required this.scoreModel}): super(key: key);
+
+  final String title;
   final ScoreModel scoreModel;
 
-  DictationQuestionPage({required this.scoreModel});
-
   @override
-  _DictationQuestionPageState createState() => _DictationQuestionPageState();
+  State<VoiceChoiceQuestionPage> createState() => _VoiceChoiceQuestionPageState();
 }
 
-class _DictationQuestionPageState extends State<DictationQuestionPage> {
+class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
   List<Question> questionList = [];
   AudioPlayer audioPlayer = AudioPlayer();
-  int currentQuestionIndex = 0;
-  String? result;
-  TextEditingController textController = TextEditingController();
+
 
   Future<void> playAudio(String storageUrl) async {
     final String downloadUrl =
@@ -30,7 +29,7 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
 
   void fetchQuestion() async {
     final questionCollection =
-        await FirebaseFirestore.instance.collection('dictation').get();
+        await FirebaseFirestore.instance.collection('voicechoice').get();
     final docs = questionCollection.docs;
     for (var doc in docs) {
       Question question = Question.fromMap(doc.data());
@@ -45,8 +44,13 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
     fetchQuestion();
   }
 
-  void checkAnswer(Question question) {
-    if (question.correctAnswer == textController.text.trim()) {
+  int currentQuestionIndex = 0;
+  String? result;
+
+  final scoreModel = ScoreModel();
+
+  void checkAnswer(Question question, String selectedChoice) {
+    if (question.correctAnswer == selectedChoice) {
       result = '○';
       for (String skill in question.skills) {
         widget.scoreModel.addScore(skill, additionalScore: question.score);
@@ -54,8 +58,8 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
     } else {
       result = '×';
     }
+
     setState(() {});
-    textController.clear();
 
     if (currentQuestionIndex >= questionList.length - 1) {
       Future.delayed(Duration(seconds: 2), () {
@@ -63,8 +67,8 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
         // 結果ページへ遷移するコード
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => VoiceChoiceQuestionPage(
-              title: 'voicechoice',
+            builder: (context) => ConversationQuestionPage(
+              title: 'conversation',
               scoreModel: widget.scoreModel,),
           ),
         );
@@ -92,32 +96,28 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
     Question question = questionList[currentQuestionIndex];
     return Scaffold(
       appBar: AppBar(
-        title: Text("Dictation Question"),
+        title: Text(widget.title),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (result != null) Text('結果: $result'),
-            const Text('音声を文字起こししてください'),
+            const Text('音声に合う選択肢を選んでください'),
             TextButton(
               onPressed: () {
                 playAudio(question.audioUrl);
               },
               child: Text('Play Audio'),
             ),
-            TextField(
-              controller: textController,
-              decoration: InputDecoration(
-                hintText: '音声を文字起こししてください',
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                checkAnswer(question);
-              },
-              child: Text('答えを確認'),
-            ),
+            ...question.choices.map((choice) {
+              return ElevatedButton(
+                onPressed: () {
+                  checkAnswer(question, choice);
+                },
+                child: Text(choice),
+              );
+            }).toList(),
           ],
         ),
       ),

@@ -1,21 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:english_test_app/%20pages/fillintheblank_page.dart';
-import 'package:english_test_app/%20pages/result_page.dart';
+import 'package:english_test_app/pages/fillintheblank_page.dart';
 import 'package:english_test_app/model/question_model.dart';
 import 'package:flutter/material.dart';
 import 'package:english_test_app/model/score_model.dart';
 
-class ChoiceQuestionPage extends StatefulWidget {
-  const ChoiceQuestionPage({Key? key, required this.title, required this.scoreModel}): super(key: key);
+class ConversationQuestionPage extends StatefulWidget {
+  const ConversationQuestionPage({Key? key, required this.title, required this.scoreModel}): super(key: key);
 
   final String title;
   final ScoreModel scoreModel;
 
   @override
-  State<ChoiceQuestionPage> createState() => _ChoiceQuestionPageState();
+  State<ConversationQuestionPage> createState() => _ConversationQuestionPageState();
 }
 
-class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
+class _ConversationQuestionPageState extends State<ConversationQuestionPage> {
   List<Question> questionList = [];
   int currentQuestionIndex = 0;
   String? result;
@@ -23,7 +22,7 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
   
   void fetchQuestion() async {
     final questionCollection =
-        await FirebaseFirestore.instance.collection('choice').get();
+        await FirebaseFirestore.instance.collection('conversation').get();
     final docs = questionCollection.docs;
     for (var doc in docs) {
       Question question = Question.fromMap(doc.data());
@@ -53,10 +52,12 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
 
     if (currentQuestionIndex >= questionList.length - 1) {
       Future.delayed(Duration(seconds: 2), () {
-        Navigator.push(
-          context,
+        // 2秒待つ
+        Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => ResultPage(scoreModel: widget.scoreModel),
+            builder: (context) => FillBlankPage(
+              title: 'voicechoice',
+              scoreModel: widget.scoreModel,),
           ),
         );
       });
@@ -78,7 +79,7 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
     }
     var question = questionList[currentQuestionIndex];
     return Scaffold(
-    appBar: AppBar(title: Text('Choice Question')),
+    appBar: AppBar(title: Text('Conversation Question')),
     body: Center(
      child: Column(
        mainAxisAlignment: MainAxisAlignment.center,
