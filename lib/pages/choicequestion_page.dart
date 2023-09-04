@@ -18,6 +18,7 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
   List<Question> questionList = [];
   int currentQuestionIndex = 0;
   String? result;
+  bool isAnswered = false;  // 追加
   
   void fetchQuestion() async {
     final questionCollection = await FirebaseFirestore.instance.collection('choice').get();
@@ -48,27 +49,35 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
     setState(() {
       currentQuestionIndex++;
       result = null;
+      isAnswered = false;  // 追加
     });
   }
 
   void checkAnswer(Question question, String selectedChoice) {
-    if (question.correctAnswer == selectedChoice) {
-      result = '○';
-      for (String skill in question.skills) {
-        widget.scoreModel.addScore(skill, additionalScore: question.score);
+    if (!isAnswered) {
+      isAnswered = true;
+      if (question.correctAnswer == selectedChoice) {
+        result = '○';
+        for (String skill in question.skills) {
+          widget.scoreModel.addScore(skill, additionalScore: question.score);
+        }
+      } else {
+        result = '×';
       }
-    } else {
-      result = '×';
-    }
-    
-    setState(() {});
 
-    if (currentQuestionIndex >= questionList.length - 1) {
-      Future.delayed(Duration(seconds: 2), navigateToResultPage);
-    } else {
-      Future.delayed(Duration(seconds: 2), goToNextQuestion);
+      setState(() {});
+
+      Future.delayed(Duration(seconds: 2), () {
+        setState(() {
+          if (currentQuestionIndex >= questionList.length - 1) {
+            navigateToResultPage();
+          } else {
+            goToNextQuestion();
+          }
+        });
+      });
     }
-  }
+  }  
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +95,7 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
             ...question.sentences.map((sentence) => Text(sentence)).toList(),
             ...List.generate(question.choices.length, (index) {
               return ElevatedButton(
-                onPressed: () => checkAnswer(question , question.choices[index]),
+                onPressed: isAnswered ? null : () => checkAnswer(question , question.choices[index]),  // 修正
                 child: Text(question.choices[index]),
               );
             }),

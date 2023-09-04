@@ -18,6 +18,7 @@ class _ConversationQuestionPageState extends State<ConversationQuestionPage> {
   List<Question> questionList = [];
   int currentQuestionIndex = 0;
   String? result;
+  bool isButtonDisabled = false;
 
   @override
   void initState() {
@@ -51,30 +52,35 @@ class _ConversationQuestionPageState extends State<ConversationQuestionPage> {
   }
 
   void goToNextQuestion() {
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        currentQuestionIndex++;
-        result = null;
-      });
+    setState(() {
+      isButtonDisabled = false;
+      currentQuestionIndex++;
+      result = null;
     });
   }
 
   void checkAnswer(Question question, String selectedChoice) {
-    if (question.correctAnswer == selectedChoice) {
-      result = '○';
-      for (String skill in question.skills) {
-        widget.scoreModel.addScore(skill, additionalScore: question.score);
+    if (!isButtonDisabled) {
+      isButtonDisabled = true;
+
+      if (question.correctAnswer == selectedChoice) {
+        result = '○';
+        for (String skill in question.skills) {
+          widget.scoreModel.addScore(skill, additionalScore: question.score);
+        }
+      } else {
+        result = '×';
       }
-    } else {
-      result = '×';
-    }
 
-    setState(() {});
+      setState(() {});
 
-    if (currentQuestionIndex >= questionList.length - 1) {
-      navigateToNextPage();
-    } else {
-      goToNextQuestion();
+      Future.delayed(Duration(seconds: 2), () {
+        if (currentQuestionIndex >= questionList.length - 1) {
+          navigateToNextPage();
+        } else {
+          goToNextQuestion();
+        }
+      });
     }
   }
 
@@ -94,7 +100,7 @@ class _ConversationQuestionPageState extends State<ConversationQuestionPage> {
             ...question.sentences.map((sentence) => Text(sentence)).toList(),
             ...List.generate(question.choices.length, (index) {
               return ElevatedButton(
-                onPressed: () => checkAnswer(question, question.choices[index]),
+                onPressed: isButtonDisabled ? null : () => checkAnswer(question, question.choices[index]),
                 child: Text(question.choices[index]),
               );
             }),

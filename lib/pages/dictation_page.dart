@@ -21,6 +21,7 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
   int currentQuestionIndex = 0;
   String? result;
   TextEditingController textController = TextEditingController();
+  bool isAnswered = false;  // このフラグを追加
 
   Future<void> playAudio(String storageUrl) async {
     try {
@@ -28,7 +29,6 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
           await FirebaseStorage.instance.refFromURL(storageUrl).getDownloadURL();
       await audioPlayer.play(downloadUrl);
     } catch (e) {
-      // handle the error here
       print("Error while playing audio: $e");
     }
   }
@@ -44,7 +44,6 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
       }
       setState(() {});
     } catch (e) {
-      // handle the error here
       print("Error while fetching questions: $e");
     }
   }
@@ -56,21 +55,25 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
   }
 
   void checkAnswer(Question question) {
-    if (question.correctAnswer == textController.text.trim()) {
-      result = '○';
-      for (String skill in question.skills) {
-        widget.scoreModel.addScore(skill, additionalScore: question.score);
-      }
-    } else {
-      result = '×';
-    }
-    setState(() {});
-    textController.clear();
+    if (!isAnswered) {  // この条件を追加
+      isAnswered = true;  // フラグを設定
 
-    if (currentQuestionIndex >= questionList.length - 1) {
-      navigateToNextPage();
-    } else {
-      goToNextQuestion();
+      if (question.correctAnswer == textController.text.trim()) {
+        result = '○';
+        for (String skill in question.skills) {
+          widget.scoreModel.addScore(skill, additionalScore: question.score);
+        }
+      } else {
+        result = '×';
+      }
+      setState(() {});
+      textController.clear();
+
+      if (currentQuestionIndex >= questionList.length - 1) {
+        navigateToNextPage();
+      } else {
+        goToNextQuestion();
+      }
     }
   }
 
@@ -79,9 +82,10 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => VoiceChoiceQuestionPage(
-              title: 'voicechoice',
-              scoreModel: widget.scoreModel,),
+          builder: (context) => VoiceChoiceQuestionPage(
+            title: 'voicechoice',
+            scoreModel: widget.scoreModel,
+          ),
         ),
       );
     });
@@ -90,6 +94,7 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
   void goToNextQuestion() {
     Future.delayed(Duration(seconds: 2), () {
       setState(() {
+        isAnswered = false;  // フラグをリセット
         currentQuestionIndex++;
         result = null;
       });

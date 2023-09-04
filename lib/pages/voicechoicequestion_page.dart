@@ -21,6 +21,7 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
   AudioPlayer audioPlayer = AudioPlayer();
   int currentQuestionIndex = 0;
   String? result;
+  bool isButtonDisabled = false;
 
   @override
   void initState() {
@@ -60,30 +61,35 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
   }
 
   void goToNextQuestion() {
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        currentQuestionIndex++;
-        result = null;
-      });
+    setState(() {
+      isButtonDisabled = false;
+      currentQuestionIndex++;
+      result = null;
     });
   }
 
   void checkAnswer(Question question, String selectedChoice) {
-    if (question.correctAnswer == selectedChoice) {
-      result = '○';
-      for (String skill in question.skills) {
-        widget.scoreModel.addScore(skill, additionalScore: question.score);
+    if (!isButtonDisabled) {
+      isButtonDisabled = true;
+
+      if (question.correctAnswer == selectedChoice) {
+        result = '○';
+        for (String skill in question.skills) {
+          widget.scoreModel.addScore(skill, additionalScore: question.score);
+        }
+      } else {
+        result = '×';
       }
-    } else {
-      result = '×';
-    }
 
-    setState(() {});
+      setState(() {});
 
-    if (currentQuestionIndex >= questionList.length - 1) {
-      navigateToNextPage();
-    } else {
-      goToNextQuestion();
+      Future.delayed(Duration(seconds: 2), () {
+        if (currentQuestionIndex >= questionList.length - 1) {
+          navigateToNextPage();
+        } else {
+          goToNextQuestion();
+        }
+      });
     }
   }
 
@@ -115,9 +121,7 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
             ),
             ...question.choices.map((choice) {
               return ElevatedButton(
-                onPressed: () {
-                  checkAnswer(question, choice);
-                },
+                onPressed: isButtonDisabled ? null : () => checkAnswer(question, choice),
                 child: Text(choice),
               );
             }).toList(),

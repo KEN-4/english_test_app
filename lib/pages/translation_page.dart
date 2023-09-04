@@ -20,6 +20,7 @@ class _TranslationPageState extends State<TranslationPage> {
   int currentQuestionIndex = 0;
   String? result;
   TextEditingController textController = TextEditingController();
+  bool isButtonDisabled = false;
 
   @override
   void initState() {
@@ -54,27 +55,31 @@ class _TranslationPageState extends State<TranslationPage> {
       setState(() {
         currentQuestionIndex++;
         result = null;
+        isButtonDisabled = false;
       });
     });
   }
 
   void checkAnswer(Question question) {
-    if (question.correctAnswer == textController.text.trim()) {
-      result = '○';
-      for (String skill in question.skills) {
-        widget.scoreModel.addScore(skill, additionalScore: question.score);
+    if (!isButtonDisabled) {
+      isButtonDisabled = true;
+      if (question.correctAnswer == textController.text) {
+        result = '○';
+        for (String skill in question.skills) {
+          widget.scoreModel.addScore(skill, additionalScore: question.score);
+        }
+      } else {
+        result = '×';
       }
-    } else {
-      result = '×';
-    }
-    
-    setState(() {});
-    textController.clear();
 
-    if (currentQuestionIndex >= questionList.length - 1) {
-      navigateToNextPage();
-    } else {
-      goToNextQuestion();
+      setState(() {});
+      textController.clear();
+
+      if (currentQuestionIndex >= questionList.length - 1) {
+        navigateToNextPage();
+      } else {
+        goToNextQuestion();
+      }
     }
   }
 
@@ -108,11 +113,10 @@ class _TranslationPageState extends State<TranslationPage> {
                 border: OutlineInputBorder(),
                 labelText: 'Answer',
               ),
+              enabled: !isButtonDisabled,
             ),
             ElevatedButton(
-              onPressed: () {
-                checkAnswer(question);
-              },
+              onPressed: isButtonDisabled ? null : () => checkAnswer(question), 
               child: Text('Check Answer'),
             ),
           ],

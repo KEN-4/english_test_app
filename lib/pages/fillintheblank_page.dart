@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:english_test_app/pages/result_page.dart';
 import 'package:english_test_app/pages/translation_page.dart';
 import 'package:english_test_app/model/question_model.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +20,7 @@ class _FillBlankPageState extends State<FillBlankPage> {
   int currentQuestionIndex = 0;
   String? result;
   TextEditingController textController = TextEditingController();
+  bool isButtonDisabled = false;
 
   void fetchQuestion() async {
     final questionCollection =
@@ -40,38 +40,41 @@ class _FillBlankPageState extends State<FillBlankPage> {
   }
 
   void checkAnswer(Question question) {
-    if (question.answers.contains(textController.text.trim())) {
-      result = '○';
-      for (String skill in question.skills) {
-        widget.scoreModel.addScore(skill, additionalScore: question.score);
+    if (!isButtonDisabled) {
+      isButtonDisabled = true;
+      
+      if (question.answers.contains(textController.text.trim())) {
+        result = '○';
+        for (String skill in question.skills) {
+          widget.scoreModel.addScore(skill, additionalScore: question.score);
+        }
+      } else {
+        result = '×';
       }
-    } else {
-      result = '×';
-    }
 
-    setState(() {});
-    textController.clear();
+      setState(() {});
+      textController.clear();
 
-    if (currentQuestionIndex >= questionList.length - 1) {
       Future.delayed(Duration(seconds: 2), () {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => TranslationPage(
-              title: 'translation',
-              scoreModel: widget.scoreModel,),
-          ),
-        );
-      });
-    } else {
-      Future.delayed(Duration(seconds: 2), () {
-        if (mounted) {  // ウィジェットがマウントされているかどうか確認
-          setState(() {
-            currentQuestionIndex++;
-            result = null;
-          });
+        if (currentQuestionIndex >= questionList.length - 1) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => TranslationPage(
+                title: 'translation',
+                scoreModel: widget.scoreModel,
+              ),
+            ),
+          );
+        } else {
+          if (mounted) {
+            setState(() {
+              isButtonDisabled = false;
+              currentQuestionIndex++;
+              result = null;
+            });
+          }
         }
       });
-
     }
   }
 
@@ -97,9 +100,7 @@ class _FillBlankPageState extends State<FillBlankPage> {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
-                checkAnswer(question);
-              },
+              onPressed: isButtonDisabled ? null : () => checkAnswer(question),
               child: Text('Check Answer'),
             ),
           ],

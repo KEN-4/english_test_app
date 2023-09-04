@@ -11,7 +11,7 @@ class L2QuestionPage extends StatefulWidget {
 
   final String title;
   final ScoreModel scoreModel;
-  
+
   @override
   State<L2QuestionPage> createState() => _L2QuestionPageState();
 }
@@ -19,6 +19,9 @@ class L2QuestionPage extends StatefulWidget {
 class _L2QuestionPageState extends State<L2QuestionPage> {
   List<Question> questionList = [];
   AudioPlayer audioPlayer = AudioPlayer();
+  bool isAnswered = false; // このフラグを追加
+  int currentQuestionIndex = 0;
+  String? result;
 
   Future<void> playAudio(String storageUrl) async {
     try {
@@ -26,7 +29,6 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
           await FirebaseStorage.instance.refFromURL(storageUrl).getDownloadURL();
       await audioPlayer.play(downloadUrl);
     } catch (e) {
-      // handle the error here
       print("Error while playing audio: $e");
     }
   }
@@ -48,25 +50,26 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
     fetchQuestion();
   }
 
-  int currentQuestionIndex = 0;
-  String? result;
-
   void checkAnswer(Question question, String selectedChoice) {
-    if (question.correctAnswer == selectedChoice) {
-      result = '○';
-      for (String skill in question.skills) {
-        widget.scoreModel.addScore(skill, additionalScore: question.score);
+    if (!isAnswered) { // この条件を追加
+      isAnswered = true; // フラグを設定
+
+      if (question.correctAnswer == selectedChoice) {
+        result = '○';
+        for (String skill in question.skills) {
+          widget.scoreModel.addScore(skill, additionalScore: question.score);
+        }
+      } else {
+        result = '×';
       }
-    } else {
-      result = '×';
-    }
 
-    setState(() {});
+      setState(() {});
 
-    if (currentQuestionIndex >= questionList.length - 1) {
-      navigateToNextPage();
-    } else {
-      goToNextQuestion();
+      if (currentQuestionIndex >= questionList.length - 1) {
+        navigateToNextPage();
+      } else {
+        goToNextQuestion();
+      }
     }
   }
 
@@ -75,7 +78,8 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => DictationQuestionPage(scoreModel: widget.scoreModel)),
+          builder: (context) => DictationQuestionPage(scoreModel: widget.scoreModel),
+        ),
       );
     });
   }
@@ -83,12 +87,12 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
   void goToNextQuestion() {
     Future.delayed(Duration(seconds: 2), () {
       setState(() {
+        isAnswered = false; // フラグをリセット
         currentQuestionIndex++;
         result = null;
       });
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -99,26 +103,28 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
         ),
       );
     }
-    Question question = questionList[currentQuestionIndex];
+
+    var question = questionList[currentQuestionIndex];
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center, 
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (result != null) Text('結果: $result'),
+            if (result != null) Text('Result: $result'),
             const Text('発音した単語を選んでください'),
             TextButton(
-              onPressed: () {
+              onPressed: isAnswered ? null : () {
                 playAudio(question.audioUrl);
               },
               child: Text('Play Audio'),
             ),
             ...question.choices.map((choice) {
               return ElevatedButton(
-                onPressed: () {
+                onPressed: isAnswered ? null : () {
                   checkAnswer(question, choice);
                 },
                 child: Text(choice),
