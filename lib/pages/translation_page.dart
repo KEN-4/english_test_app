@@ -100,6 +100,7 @@ class _TranslationPageState extends State<TranslationPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (result != null) Text('Result: $result'),
+            const Text('日本語の文を英文に訳してください'),
             ...question.sentences.map((sentence) => Text(sentence)).toList(),
             ...List.generate(question.choices.length, (index) {
               return ElevatedButton(

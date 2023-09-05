@@ -85,12 +85,13 @@ class _FillBlankPageState extends State<FillBlankPage> {
     }
     var question = questionList[currentQuestionIndex];
     return Scaffold(
-      appBar: AppBar(title: Text('Translation Question')),
+      appBar: AppBar(title: Text('Fill in the Blank Question')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (result != null) Text('Result: $result'),
+            const Text('会話文の続きを記述してください'),
             ...question.sentences.map((sentence) => Text(sentence)).toList(),
             TextField(
               controller: textController,

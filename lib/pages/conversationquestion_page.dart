@@ -97,6 +97,7 @@ class _ConversationQuestionPageState extends State<ConversationQuestionPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (result != null) Text('Result: $result'),
+            const Text('会話文の続きを選んでください'),
             ...question.sentences.map((sentence) => Text(sentence)).toList(),
             ...List.generate(question.choices.length, (index) {
               return ElevatedButton(

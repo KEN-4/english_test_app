@@ -18,7 +18,7 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
   List<Question> questionList = [];
   int currentQuestionIndex = 0;
   String? result;
-  bool isAnswered = false;  // 追加
+  bool isAnswered = false;
   
   void fetchQuestion() async {
     final questionCollection = await FirebaseFirestore.instance.collection('choice').get();
@@ -49,7 +49,7 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
     setState(() {
       currentQuestionIndex++;
       result = null;
-      isAnswered = false;  // 追加
+      isAnswered = false;
     });
   }
 
@@ -92,6 +92,7 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (result != null) Text('Result: $result'),
+            const Text('( )に当てはまる物を選んでください'),
             ...question.sentences.map((sentence) => Text(sentence)).toList(),
             ...List.generate(question.choices.length, (index) {
               return ElevatedButton(
