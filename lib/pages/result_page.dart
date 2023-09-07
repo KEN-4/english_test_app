@@ -1,5 +1,13 @@
+import 'package:english_test_app/model/recommend_model.dart';
 import 'package:english_test_app/model/score_model.dart';
 import 'package:flutter/material.dart';
+
+String capitalizeFirstLetter(String text) {
+  if (text == null || text.isEmpty) {
+    return text;
+  }
+  return text[0].toUpperCase() + text.substring(1).toLowerCase();
+}
 
 class ResultPage extends StatelessWidget {
   final ScoreModel scoreModel;
@@ -8,26 +16,59 @@ class ResultPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<String> recommendations = getMostNeededStudyMethods(scoreModel.scores);
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Result'),
-      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ...scoreModel.scores.keys.map((key) {
-              return Text(
-                '$key Score: ${scoreModel.scores[key] ?? 0}',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              );
-            }).toList(),
+            Text(
+              'スコア',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            ...scoreModel.scores.entries.map(
+              (e) => Text('${capitalizeFirstLetter(e.key)}: ${e.value}'),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'おすすめの学習方法',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            ...recommendations.map((rec) => Text(rec)),
           ],
         ),
       ),
     );
   }
+}
+
+List<String> getMostNeededStudyMethods(Map<String, double> scores) {
+  List<String> lowestSkills = [];
+  double lowestScore = 10.0;
+
+  scores.forEach((skill, score) {
+    if (score < lowestScore) {
+      lowestScore = score;
+      lowestSkills = [skill];
+    } else if (score == lowestScore) {
+      lowestSkills.add(skill);
+    }
+  });
+
+  List<String> recommendations = [];
+  for (String lowestSkill in lowestSkills) {
+    String level;
+    if (lowestScore >= 7.0) {
+      level = 'advanced';
+    } else if (lowestScore >= 4.0) {
+      level = 'intermediate';
+    } else {
+      level = 'beginner';
+    }
+    String recommendation = studyRecommendations[lowestSkill]?[level] ?? 'No recommendation available';
+    recommendations.add(recommendation);
+  }
+
+  return recommendations;
 }

@@ -111,7 +111,7 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (result != null) Text('結果: $result'),
+            if (result != null) Text('Result: $result'),
             const Text('音声に合う選択肢を選んでください'),
             TextButton(
               onPressed: () {

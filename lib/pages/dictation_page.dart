@@ -119,7 +119,7 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (result != null) Text('結果: $result'),
+            if (result != null) Text('Result: $result'),
             const Text('音声を文字起こししてください'),
             TextButton(
               onPressed: () {

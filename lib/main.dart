@@ -1,3 +1,4 @@
+import 'package:english_test_app/pages/login_page.dart';
 import 'package:english_test_app/pages/top_page.dart';
 import 'package:english_test_app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: TopPage(),
+      home: LoginPage(),
     );
   }
 }
