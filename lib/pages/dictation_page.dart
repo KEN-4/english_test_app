@@ -21,7 +21,7 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
   int currentQuestionIndex = 0;
   String? result;
   TextEditingController textController = TextEditingController();
-  bool isAnswered = false;  // このフラグを追加
+  bool isAnswered = false;
 
   Future<void> playAudio(String storageUrl) async {
     try {
@@ -55,8 +55,8 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
   }
 
   void checkAnswer(Question question) {
-    if (!isAnswered) {  // この条件を追加
-      isAnswered = true;  // フラグを設定
+    if (!isAnswered) {
+      isAnswered = true;
 
       if (question.correctAnswer == textController.text.trim()) {
         result = '○';
@@ -83,7 +83,7 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
         context,
         MaterialPageRoute(
           builder: (context) => VoiceChoiceQuestionPage(
-            title: 'voicechoice',
+            title: 'Listening Test',
             scoreModel: widget.scoreModel,
           ),
         ),
@@ -113,7 +113,7 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
     Question question = questionList[currentQuestionIndex];
     return Scaffold(
       appBar: AppBar(
-        title: Text("Dictation Question"),
+        title: Text("Dictation Test"),
       ),
       body: Center(
         child: Column(

@@ -13,7 +13,7 @@ class TopPage extends StatelessWidget {
       context,
       MaterialPageRoute(
         builder: (context) => L2QuestionPage(
-          title: 'Listening Page',
+          title: 'Listening Test',
           scoreModel: scoreModel,
         ),
       ),

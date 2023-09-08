@@ -43,7 +43,7 @@ class _TranslationPageState extends State<TranslationPage> {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => ChoiceQuestionPage(
-            title: 'choice',
+            title: 'Choice Test',
             scoreModel: widget.scoreModel,),
         ),
       );
@@ -94,7 +94,7 @@ class _TranslationPageState extends State<TranslationPage> {
     }
     var question = questionList[currentQuestionIndex];
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(title: Text('Translation Test')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

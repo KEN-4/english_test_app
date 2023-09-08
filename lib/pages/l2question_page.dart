@@ -51,8 +51,8 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
   }
 
   void checkAnswer(Question question, String selectedChoice) {
-    if (!isAnswered) { // この条件を追加
-      isAnswered = true; // フラグを設定
+    if (!isAnswered) {
+      isAnswered = true;
 
       if (question.correctAnswer == selectedChoice) {
         result = '○';
@@ -87,7 +87,7 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
   void goToNextQuestion() {
     Future.delayed(Duration(seconds: 2), () {
       setState(() {
-        isAnswered = false; // フラグをリセット
+        isAnswered = false;
         currentQuestionIndex++;
         result = null;
       });
