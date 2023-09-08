@@ -1,5 +1,7 @@
 import 'package:english_test_app/model/recommend_model.dart';
 import 'package:english_test_app/model/score_model.dart';
+import 'package:english_test_app/pages/login_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 String capitalizeFirstLetter(String text) {
@@ -36,6 +38,23 @@ class ResultPage extends StatelessWidget {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             ...recommendations.map((rec) => Text(rec)),
+            SizedBox(height: 40),
+            ElevatedButton(
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                await Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginPage(),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white
+              ),
+              child: Text('Logout'),
+            ),
           ],
         ),
       ),
