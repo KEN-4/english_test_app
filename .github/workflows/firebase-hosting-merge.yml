@@ -11,7 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: flutter build web
+      - uses: actions/setup-java@v2  # Optional, if you have Android code or dependencies
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+      - uses: subosito/flutter-action@v2  # Flutter setup
+        with:
+          flutter-version: 'latest'
+      - run: flutter pub get  # Install Flutter dependencies
+      - run: flutter build web --release  # Build Flutter web
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
