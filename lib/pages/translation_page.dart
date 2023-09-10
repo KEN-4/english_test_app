@@ -120,6 +120,13 @@ class _TranslationPageState extends State<TranslationPage> {
               onPressed: isButtonDisabled ? null : () => checkAnswer(question), 
               child: Text('Check Answer'),
             ),
+            ElevatedButton(onPressed: () => textController.clear(), 
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white
+              ),
+              child: Text('Clear'),
+            ),
           ],
         ),
       ),
