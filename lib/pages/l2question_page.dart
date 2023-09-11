@@ -107,22 +107,27 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (result != null) Text('Result: $result'),
+            SizedBox(height: 8),
             const Text('発音した単語を選んでください'),
+            SizedBox(height: 8),
             TextButton(
               onPressed: isAnswered ? null : () {
                 playAudio(question.audioUrl);
               },
               child: Text('Play Audio'),
             ),
-            ...question.choices.map((choice) {
-              return ElevatedButton(
+            SizedBox(height: 8),
+            ...question.choices.expand((choice) => [
+              ElevatedButton(
                 onPressed: isAnswered ? null : () {
                   checkAnswer(question, choice);
                 },
                 child: Text(choice),
-              );
-            }).toList(),
-            if (isAnswered) Text('正解は ${question.correctAnswer}'),
+              ),
+              SizedBox(height: 8),
+            ]).toList(),
+            if (isAnswered) Text('Correct Answer: ${question.correctAnswer}'),
+            SizedBox(height: 8),
             if (isAnswered) ElevatedButton(
               onPressed: goToNextQuestion,
               child: Text('Next Question'),

@@ -91,15 +91,28 @@ class _ConversationQuestionPageState extends State<ConversationQuestionPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (result != null) Text('Result: $result'),
+            SizedBox(height: 8),
             const Text('会話文の続きを選んでください'),
-            ...question.sentences.map((sentence) => Text(sentence)).toList(),
+            SizedBox(height: 8),
+            ...question.sentences.map((sentence) => Column(
+              children: [
+                Text(sentence),
+                SizedBox(height: 8),
+              ],
+            )).toList(),
             ...List.generate(question.choices.length, (index) {
-              return ElevatedButton(
-                onPressed: isAnswered ? null : () => checkAnswer(question, question.choices[index]),
-                child: Text(question.choices[index]),
+              return Column(
+                children: [
+                  ElevatedButton(
+                    onPressed: isAnswered ? null : () => checkAnswer(question, question.choices[index]),
+                    child: Text(question.choices[index]),
+                  ),
+                  SizedBox(height: 8),
+                ],
               );
             }),
-            if (isAnswered) Text('Answer: ${question.correctAnswer}'),
+            if (isAnswered) Text('Correct Answer: ${question.correctAnswer}'),
+            if (isAnswered) SizedBox(height: 8),
             if (isAnswered) ElevatedButton(
               onPressed: goToNextQuestion,
               child: Text('Next Question'),

@@ -86,15 +86,26 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (result != null) Text('Result: $result'),
+            SizedBox(height: 8),
             const Text('( )に当てはまる物を選んでください'),
-            ...question.sentences.map((sentence) => Text(sentence)).toList(),
-            ...List.generate(question.choices.length, (index) {
-              return ElevatedButton(
-                onPressed: isAnswered ? null : () => checkAnswer(question , question.choices[index]),  // 修正
-                child: Text(question.choices[index]),
-              );
-            }),
+            SizedBox(height: 8),
+            ...question.sentences.map((sentence) => Column(
+              children: [
+                Text(sentence),
+                SizedBox(height: 8),
+              ],
+            )).toList(),
+            ...List.generate(question.choices.length, (index) => Column(
+              children: [
+                ElevatedButton(
+                  onPressed: isAnswered ? null : () => checkAnswer(question , question.choices[index]),
+                  child: Text(question.choices[index]),
+                ),
+                SizedBox(height: 8),
+              ],
+            )),
             if (isAnswered) Text('Answer: ${question.correctAnswer}'),
+            if (isAnswered) SizedBox(height: 8),
             if (isAnswered) ElevatedButton(
               onPressed: goToNextQuestion,
               child: Text('Next Question'),

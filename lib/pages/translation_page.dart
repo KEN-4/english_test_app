@@ -94,34 +94,49 @@ class _TranslationPageState extends State<TranslationPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (result != null) Text('Result: $result'),
+            SizedBox(height: 8),
             const Text('日本語の文を英文に訳してください'),
-            ...question.sentences.map((sentence) => Text(sentence)).toList(),
-            ...List.generate(question.choices.length, (index) {
-              return ElevatedButton(
-                onPressed: () => addChoiceToTextField(question.choices[index]),
-                child: Text(question.choices[index]),
-              );
-            }),
+            SizedBox(height: 8),
+            ...question.sentences.map((sentence) => Column(
+              children: [
+                Text(sentence),
+                SizedBox(height: 8),
+              ],
+            )).toList(),
+            ...List.generate(question.choices.length, (index) => Column(
+              children: [
+                ElevatedButton(
+                  onPressed: () => addChoiceToTextField(question.choices[index]),
+                  child: Text(question.choices[index]),
+                ),
+                SizedBox(height: 8),
+              ],
+            )),
             TextField(
               controller: textController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Answer',
+                labelText: 'Add text by pressing the button',
               ),
               enabled: !isAnswered,
             ),
+            SizedBox(height: 8),
             ElevatedButton(
-              onPressed: isAnswered ? null : () => checkAnswer(question), 
+              onPressed: isAnswered ? null : () => checkAnswer(question),
               child: Text('Check Answer'),
             ),
-            ElevatedButton(onPressed: () => textController.clear(), 
-            style: ElevatedButton.styleFrom(
+            SizedBox(height: 8),
+            ElevatedButton(
+              onPressed: () => textController.clear(),
+              style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
-                foregroundColor: Colors.white
+                foregroundColor: Colors.white,
               ),
               child: Text('Clear'),
             ),
-            if (isAnswered) Text('Answer: ${question.correctAnswer}'),
+            SizedBox(height: 8),
+            if (isAnswered) Text('Correct Answer: ${question.correctAnswer}'),
+            if (isAnswered) SizedBox(height: 8),
             if (isAnswered) ElevatedButton(
               onPressed: goToNextQuestion,
               child: Text('Next Question'),

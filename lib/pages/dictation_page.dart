@@ -113,26 +113,32 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (result != null) Text('Result: $result'),
+            SizedBox(height: 8),
             const Text('音声を文字起こししてください'),
+            SizedBox(height: 8), 
             TextButton(
               onPressed: () {
                 playAudio(question.audioUrl);
               },
               child: Text('Play Audio'),
             ),
+            SizedBox(height: 8),
             TextField(
               controller: textController,
               decoration: InputDecoration(
                 hintText: '音声を文字起こししてください',
               ),
             ),
+            SizedBox(height: 8),
             ElevatedButton(
               onPressed: isAnswered ? null : () {
                 checkAnswer(question);
               },
               child: Text('Check Answer'),
             ),
-            if (isAnswered) Text('Answer: ${question.correctAnswer}'),
+            SizedBox(height: 8),
+            if (isAnswered) Text('Correct Answer: ${question.correctAnswer}'),
+            if (isAnswered) SizedBox(height: 8),
             if (isAnswered) ElevatedButton(
               onPressed: goToNextQuestion,
               child: Text('Next Question'),

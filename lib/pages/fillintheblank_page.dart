@@ -101,21 +101,31 @@ class _FillBlankPageState extends State<FillBlankPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (result != null) Text('Result: $result'),
-            Text('Please fill in the blank.'),
-            ...question.sentences.map((sentence) => Text(sentence)).toList(),
+            SizedBox(height: 8),
+            Text('( )を埋めてください'),
+            SizedBox(height: 8),
+            ...question.sentences.map((sentence) => Column(
+              children: [
+                Text(sentence),
+                SizedBox(height: 8),
+              ],
+            )).toList(),
             TextField(
               controller: textController,
               decoration: InputDecoration(
                 hintText: 'Fill in the blank.',
               ),
             ),
+            SizedBox(height: 8),
             ElevatedButton(
               onPressed: isAnswered ? null : () {
                 checkAnswer();
               },
               child: Text('Check Answer'),
             ),
+            SizedBox(height: 8),
             if (isAnswered) Text('Example Answer: ${question.answers[0]}'),
+            if (isAnswered) SizedBox(height: 8),
             if (isAnswered) ElevatedButton(
               onPressed: goToNextQuestion,
               child: Text('Next Question'),

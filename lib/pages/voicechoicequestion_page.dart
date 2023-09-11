@@ -106,20 +106,29 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (result != null) Text('Result: $result'),
+            SizedBox(height: 8), // 追加
             const Text('音声に合う選択肢を選んでください'),
+            SizedBox(height: 8), // 追加
             TextButton(
               onPressed: () {
                 playAudio(question.audioUrl);
               },
               child: Text('Play Audio'),
             ),
+            SizedBox(height: 8), // 追加
             ...question.choices.map((choice) {
-              return ElevatedButton(
-                onPressed: isAnswered ? null : () => checkAnswer(question, choice),
-                child: Text(choice),
+              return Column(
+                children: [
+                  ElevatedButton(
+                    onPressed: isAnswered ? null : () => checkAnswer(question, choice),
+                    child: Text(choice),
+                  ),
+                  SizedBox(height: 8), // 追加
+                ],
               );
             }).toList(),
-            if (isAnswered) Text('Answer ${question.correctAnswer}'),
+            if (isAnswered) Text('Correct Answer: ${question.correctAnswer}'),
+            if (isAnswered) SizedBox(height: 8), 
             if (isAnswered) ElevatedButton(
               onPressed: goToNextQuestion,
               child: Text('Next Question'),
