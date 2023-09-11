@@ -57,7 +57,6 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
   void checkAnswer(Question question) {
     if (!isAnswered) {
       isAnswered = true;
-
       if (question.correctAnswer == textController.text.trim()) {
         result = '○';
         for (String skill in question.skills) {
@@ -68,17 +67,10 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
       }
       setState(() {});
       textController.clear();
-
-      if (currentQuestionIndex >= questionList.length - 1) {
-        navigateToNextPage();
-      } else {
-        goToNextQuestion();
-      }
     }
   }
 
   void navigateToNextPage() {
-    Future.delayed(Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -88,16 +80,17 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
           ),
         ),
       );
-    });
   }
 
   void goToNextQuestion() {
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        isAnswered = false;  // フラグをリセット
+    setState(() {
+      if (currentQuestionIndex >= questionList.length - 1) {
+        navigateToNextPage();
+      } else {
+        isAnswered = false;
         currentQuestionIndex++;
         result = null;
-      });
+      }
     });
   }
 
@@ -134,10 +127,15 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: isAnswered ? null : () {
                 checkAnswer(question);
               },
-              child: Text('答えを確認'),
+              child: Text('Check Answer'),
+            ),
+            if (isAnswered) Text('Answer: ${question.correctAnswer}'),
+            if (isAnswered) ElevatedButton(
+              onPressed: goToNextQuestion,
+              child: Text('Next Question'),
             ),
           ],
         ),

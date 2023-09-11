@@ -20,29 +20,31 @@ class _FillBlankPageState extends State<FillBlankPage> {
   int currentQuestionIndex = 0;
   String? result;
   TextEditingController textController = TextEditingController();
-  bool isButtonDisabled = false;
-
-  void fetchQuestion() async {
-    final questionCollection =
-        await FirebaseFirestore.instance.collection('fillintheblank').get();
-    final docs = questionCollection.docs;
-    for (var doc in docs) {
-      Question question = Question.fromMap(doc.data());
-      questionList.add(question);
-    }
-    setState(() {});
-  }
+  bool isAnswered = false;
 
   @override
   void initState() {
     super.initState();
-    fetchQuestion();
+    fetchQuestions();
   }
 
-  void checkAnswer(Question question) {
-    if (!isButtonDisabled) {
-      isButtonDisabled = true;
-      
+  Future<void> fetchQuestions() async {
+    try {
+      final questionCollection =
+          await FirebaseFirestore.instance.collection('fillintheblank').get();
+      questionList = questionCollection.docs
+          .map((doc) => Question.fromMap(doc.data()))
+          .toList();
+      setState(() {});
+    } catch (e) {
+      print("Error while fetching questions: $e");
+    }
+  }
+
+  void checkAnswer() {
+    if (!isAnswered) {
+      isAnswered = true;
+      Question question = questionList[currentQuestionIndex];
       if (question.answers.contains(textController.text.trim())) {
         result = '○';
         for (String skill in question.skills) {
@@ -51,58 +53,72 @@ class _FillBlankPageState extends State<FillBlankPage> {
       } else {
         result = '×';
       }
-
       setState(() {});
       textController.clear();
-
-      Future.delayed(Duration(seconds: 2), () {
-        if (currentQuestionIndex >= questionList.length - 1) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => TranslationPage(
-                title: 'translation',
-                scoreModel: widget.scoreModel,
-              ),
-            ),
-          );
-        } else {
-          if (mounted) {
-            setState(() {
-              isButtonDisabled = false;
-              currentQuestionIndex++;
-              result = null;
-            });
-          }
-        }
-      });
     }
+  }
+
+  void navigateToNextPage() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TranslationPage(
+          title: 'translation',
+          scoreModel: widget.scoreModel,
+        ),
+      ),
+    );
+  }
+
+  void goToNextQuestion() {
+    setState(() {
+      if (currentQuestionIndex >= questionList.length - 1) {
+        navigateToNextPage();
+      } else {
+        isAnswered = false;
+        currentQuestionIndex++;
+        result = null;
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     if (questionList.isEmpty) {
-      return Center(child: CircularProgressIndicator());
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
-    var question = questionList[currentQuestionIndex];
+    Question question = questionList[currentQuestionIndex];
     return Scaffold(
-      appBar: AppBar(title: Text('Fill in the Blank Question')),
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (result != null) Text('Result: $result'),
-            const Text('会話文の続きを記述してください'),
+            Text('Please fill in the blank.'),
             ...question.sentences.map((sentence) => Text(sentence)).toList(),
             TextField(
               controller: textController,
               decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Answer',
+                hintText: 'Fill in the blank.',
               ),
             ),
             ElevatedButton(
-              onPressed: isButtonDisabled ? null : () => checkAnswer(question),
+              onPressed: isAnswered ? null : () {
+                checkAnswer();
+              },
               child: Text('Check Answer'),
+            ),
+            if (isAnswered) Text('Example Answer: ${question.answers[0]}'),
+            if (isAnswered) ElevatedButton(
+              onPressed: goToNextQuestion,
+              child: Text('Next Question'),
             ),
           ],
         ),

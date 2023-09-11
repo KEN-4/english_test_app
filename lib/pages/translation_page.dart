@@ -20,7 +20,7 @@ class _TranslationPageState extends State<TranslationPage> {
   int currentQuestionIndex = 0;
   String? result;
   TextEditingController textController = TextEditingController();
-  bool isButtonDisabled = false;
+  bool isAnswered = false;
 
   @override
   void initState() {
@@ -39,30 +39,30 @@ class _TranslationPageState extends State<TranslationPage> {
   }
 
   void navigateToNextPage() {
-    Future.delayed(Duration(seconds: 2), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => ChoiceQuestionPage(
-            title: 'Choice Test',
-            scoreModel: widget.scoreModel,),
-        ),
-      );
-    });
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => ChoiceQuestionPage(
+          title: 'Choice Test',
+          scoreModel: widget.scoreModel,),
+      ),
+    );
   }
 
   void goToNextQuestion() {
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
+    setState(() {
+      if (currentQuestionIndex >= questionList.length - 1) {
+        navigateToNextPage();
+      } else {
+        isAnswered = false;
         currentQuestionIndex++;
         result = null;
-        isButtonDisabled = false;
-      });
+      }
     });
   }
 
   void checkAnswer(Question question) {
-    if (!isButtonDisabled) {
-      isButtonDisabled = true;
+    if (!isAnswered) {
+      isAnswered = true;
       if (question.correctAnswer == textController.text) {
         result = '○';
         for (String skill in question.skills) {
@@ -74,12 +74,6 @@ class _TranslationPageState extends State<TranslationPage> {
 
       setState(() {});
       textController.clear();
-
-      if (currentQuestionIndex >= questionList.length - 1) {
-        navigateToNextPage();
-      } else {
-        goToNextQuestion();
-      }
     }
   }
 
@@ -114,10 +108,10 @@ class _TranslationPageState extends State<TranslationPage> {
                 border: OutlineInputBorder(),
                 labelText: 'Answer',
               ),
-              enabled: !isButtonDisabled,
+              enabled: !isAnswered,
             ),
             ElevatedButton(
-              onPressed: isButtonDisabled ? null : () => checkAnswer(question), 
+              onPressed: isAnswered ? null : () => checkAnswer(question), 
               child: Text('Check Answer'),
             ),
             ElevatedButton(onPressed: () => textController.clear(), 
@@ -126,6 +120,11 @@ class _TranslationPageState extends State<TranslationPage> {
                 foregroundColor: Colors.white
               ),
               child: Text('Clear'),
+            ),
+            if (isAnswered) Text('Answer: ${question.correctAnswer}'),
+            if (isAnswered) ElevatedButton(
+              onPressed: goToNextQuestion,
+              child: Text('Next Question'),
             ),
           ],
         ),

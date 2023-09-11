@@ -21,7 +21,7 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
   AudioPlayer audioPlayer = AudioPlayer();
   int currentQuestionIndex = 0;
   String? result;
-  bool isButtonDisabled = false;
+  bool isAnswered = false;
 
   @override
   void initState() {
@@ -47,30 +47,32 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
   }
 
   void navigateToNextPage() {
-    Future.delayed(Duration(seconds: 2), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ConversationQuestionPage(
-              title: 'conversation',
-              scoreModel: widget.scoreModel,
-            )
-        ),
-      );
-    });
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (context) => ConversationQuestionPage(
+            title: 'conversation',
+            scoreModel: widget.scoreModel,
+          )
+      ),
+    );
   }
 
   void goToNextQuestion() {
     setState(() {
-      isButtonDisabled = false;
-      currentQuestionIndex++;
-      result = null;
+      if (currentQuestionIndex >= questionList.length - 1) {
+        navigateToNextPage();
+      } else {
+        isAnswered = false;
+        currentQuestionIndex++;
+        result = null;
+      }
     });
   }
 
   void checkAnswer(Question question, String selectedChoice) {
-    if (!isButtonDisabled) {
-      isButtonDisabled = true;
+    if (!isAnswered) {
+      isAnswered = true;
 
       if (question.correctAnswer == selectedChoice) {
         result = '○';
@@ -82,14 +84,6 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
       }
 
       setState(() {});
-
-      Future.delayed(Duration(seconds: 2), () {
-        if (currentQuestionIndex >= questionList.length - 1) {
-          navigateToNextPage();
-        } else {
-          goToNextQuestion();
-        }
-      });
     }
   }
 
@@ -121,10 +115,15 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
             ),
             ...question.choices.map((choice) {
               return ElevatedButton(
-                onPressed: isButtonDisabled ? null : () => checkAnswer(question, choice),
+                onPressed: isAnswered ? null : () => checkAnswer(question, choice),
                 child: Text(choice),
               );
             }).toList(),
+            if (isAnswered) Text('Answer ${question.correctAnswer}'),
+            if (isAnswered) ElevatedButton(
+              onPressed: goToNextQuestion,
+              child: Text('Next Question'),
+            ),
           ],
         ),
       ),

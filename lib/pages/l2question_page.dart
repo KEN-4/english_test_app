@@ -19,14 +19,13 @@ class L2QuestionPage extends StatefulWidget {
 class _L2QuestionPageState extends State<L2QuestionPage> {
   List<Question> questionList = [];
   AudioPlayer audioPlayer = AudioPlayer();
-  bool isAnswered = false; // このフラグを追加
+  bool isAnswered = false;
   int currentQuestionIndex = 0;
   String? result;
 
   Future<void> playAudio(String storageUrl) async {
     try {
-      final String downloadUrl =
-          await FirebaseStorage.instance.refFromURL(storageUrl).getDownloadURL();
+      final String downloadUrl = await FirebaseStorage.instance.refFromURL(storageUrl).getDownloadURL();
       await audioPlayer.play(downloadUrl);
     } catch (e) {
       print("Error while playing audio: $e");
@@ -34,8 +33,7 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
   }
 
   void fetchQuestion() async {
-    final questionCollection =
-        await FirebaseFirestore.instance.collection('listening_2choice').get();
+    final questionCollection = await FirebaseFirestore.instance.collection('listening_2choice').get();
     final docs = questionCollection.docs;
     for (var doc in docs) {
       Question question = Question.fromMap(doc.data());
@@ -53,7 +51,6 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
   void checkAnswer(Question question, String selectedChoice) {
     if (!isAnswered) {
       isAnswered = true;
-
       if (question.correctAnswer == selectedChoice) {
         result = '○';
         for (String skill in question.skills) {
@@ -64,34 +61,29 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
       }
 
       setState(() {});
-
-      if (currentQuestionIndex >= questionList.length - 1) {
-        navigateToNextPage();
-      } else {
-        goToNextQuestion();
-      }
     }
   }
 
+  void goToNextQuestion() {
+    setState(() {
+      if (currentQuestionIndex >= questionList.length - 1) {
+        navigateToNextPage();
+      } else {
+        isAnswered = false;
+        currentQuestionIndex++;
+        result = null;
+      }
+    });
+  }
+
+
   void navigateToNextPage() {
-    Future.delayed(Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => DictationQuestionPage(scoreModel: widget.scoreModel),
         ),
       );
-    });
-  }
-
-  void goToNextQuestion() {
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        isAnswered = false;
-        currentQuestionIndex++;
-        result = null;
-      });
-    });
   }
 
   @override
@@ -130,6 +122,11 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
                 child: Text(choice),
               );
             }).toList(),
+            if (isAnswered) Text('正解は ${question.correctAnswer}'),
+            if (isAnswered) ElevatedButton(
+              onPressed: goToNextQuestion,
+              child: Text('Next Question'),
+            ),
           ],
         ),
       ),

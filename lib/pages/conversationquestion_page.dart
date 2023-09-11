@@ -18,7 +18,7 @@ class _ConversationQuestionPageState extends State<ConversationQuestionPage> {
   List<Question> questionList = [];
   int currentQuestionIndex = 0;
   String? result;
-  bool isButtonDisabled = false;
+  bool isAnswered = false;
 
   @override
   void initState() {
@@ -38,7 +38,6 @@ class _ConversationQuestionPageState extends State<ConversationQuestionPage> {
   }
 
   void navigateToNextPage() {
-    Future.delayed(Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -48,20 +47,23 @@ class _ConversationQuestionPageState extends State<ConversationQuestionPage> {
             )
         ),
       );
-    });
   }
 
   void goToNextQuestion() {
     setState(() {
-      isButtonDisabled = false;
-      currentQuestionIndex++;
-      result = null;
+      if (currentQuestionIndex >= questionList.length - 1) {
+        navigateToNextPage();
+      } else {
+        isAnswered = false;
+        currentQuestionIndex++;
+        result = null;
+      }
     });
   }
 
   void checkAnswer(Question question, String selectedChoice) {
-    if (!isButtonDisabled) {
-      isButtonDisabled = true;
+    if (!isAnswered) {
+      isAnswered = true;
 
       if (question.correctAnswer == selectedChoice) {
         result = '○';
@@ -73,14 +75,6 @@ class _ConversationQuestionPageState extends State<ConversationQuestionPage> {
       }
 
       setState(() {});
-
-      Future.delayed(Duration(seconds: 2), () {
-        if (currentQuestionIndex >= questionList.length - 1) {
-          navigateToNextPage();
-        } else {
-          goToNextQuestion();
-        }
-      });
     }
   }
 
@@ -101,10 +95,15 @@ class _ConversationQuestionPageState extends State<ConversationQuestionPage> {
             ...question.sentences.map((sentence) => Text(sentence)).toList(),
             ...List.generate(question.choices.length, (index) {
               return ElevatedButton(
-                onPressed: isButtonDisabled ? null : () => checkAnswer(question, question.choices[index]),
+                onPressed: isAnswered ? null : () => checkAnswer(question, question.choices[index]),
                 child: Text(question.choices[index]),
               );
             }),
+            if (isAnswered) Text('Answer: ${question.correctAnswer}'),
+            if (isAnswered) ElevatedButton(
+              onPressed: goToNextQuestion,
+              child: Text('Next Question'),
+            ),
           ],
         ),
       ),

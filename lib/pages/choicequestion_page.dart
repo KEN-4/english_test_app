@@ -47,9 +47,13 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
 
   void goToNextQuestion() {
     setState(() {
-      currentQuestionIndex++;
-      result = null;
-      isAnswered = false;
+      if (currentQuestionIndex >= questionList.length - 1) {
+        navigateToResultPage();
+      } else {
+        isAnswered = false;
+        currentQuestionIndex++;
+        result = null;
+      }
     });
   }
 
@@ -66,16 +70,6 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
       }
 
       setState(() {});
-
-      Future.delayed(Duration(seconds: 2), () {
-        setState(() {
-          if (currentQuestionIndex >= questionList.length - 1) {
-            navigateToResultPage();
-          } else {
-            goToNextQuestion();
-          }
-        });
-      });
     }
   }  
 
@@ -100,6 +94,11 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
                 child: Text(question.choices[index]),
               );
             }),
+            if (isAnswered) Text('Answer: ${question.correctAnswer}'),
+            if (isAnswered) ElevatedButton(
+              onPressed: goToNextQuestion,
+              child: Text('Next Question'),
+            ),
           ],
         ),
       ),
