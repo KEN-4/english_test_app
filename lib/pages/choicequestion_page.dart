@@ -4,6 +4,7 @@ import 'package:english_test_app/model/question_model.dart';
 import 'package:flutter/material.dart';
 import 'package:english_test_app/model/score_model.dart';
 
+// 4択の問題ページ
 class ChoiceQuestionPage extends StatefulWidget {
   const ChoiceQuestionPage({Key? key, required this.title, required this.scoreModel}): super(key: key);
 
@@ -15,11 +16,12 @@ class ChoiceQuestionPage extends StatefulWidget {
 }
 
 class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
-  List<Question> questionList = [];
-  int currentQuestionIndex = 0;
-  String? result;
-  bool isAnswered = false;
+  List<Question> questionList = [];  // 質問のリスト
+  int currentQuestionIndex = 0;  // 現在の質問のインデックス
+  String? result;  // 結果
+  bool isAnswered = false;  // 回答済みかどうか
   
+  // Firestoreから質問を取得
   void fetchQuestion() async {
     final questionCollection = await FirebaseFirestore.instance.collection('choice').get();
     final docs = questionCollection.docs;
@@ -30,12 +32,14 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
     setState(() {});
   }
 
+  // 初期状態設定
   @override
   void initState() {
     super.initState();
     fetchQuestion();
   }
 
+  // 結果ページに移動
   void navigateToResultPage() {
     Navigator.pushReplacement(
       context,
@@ -45,6 +49,7 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
     );
   }
 
+  // 次の質問に移動
   void goToNextQuestion() {
     setState(() {
       if (currentQuestionIndex >= questionList.length - 1) {
@@ -57,6 +62,7 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
     });
   }
 
+  // 正解かどうかをチェック
   void checkAnswer(Question question, String selectedChoice) {
     if (!isAnswered) {
       isAnswered = true;
@@ -68,11 +74,11 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
       } else {
         result = '×';
       }
-
       setState(() {});
     }
   }  
 
+  // UI部分
   @override
   Widget build(BuildContext context) {
     if (questionList.isEmpty) {
@@ -85,7 +91,7 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (result != null) Text('Result: $result'),
+            if (result != null) Text('Result: $result'),  // 結果表示
             SizedBox(height: 8),
             const Text('( )に当てはまる物を選んでください'),
             SizedBox(height: 8),
@@ -104,10 +110,10 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
                 SizedBox(height: 8),
               ],
             )),
-            if (isAnswered) Text('Answer: ${question.correctAnswer}'),
+            if (isAnswered) Text('Answer: ${question.correctAnswer}'),  // 正解表示
             if (isAnswered) SizedBox(height: 8),
             if (isAnswered) ElevatedButton(
-              onPressed: goToNextQuestion,
+              onPressed: goToNextQuestion,  // 次へボタン
               child: Text('Next Question'),
             ),
           ],

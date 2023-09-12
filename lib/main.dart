@@ -3,34 +3,31 @@ import 'package:english_test_app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-// Entry point of the application
+
 void main() async {
-  // Ensure widgets are initialized
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
+  // Firebaseを初期化
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Run the app
+  // アプリを起動
   runApp(const MyApp());
 }
 
-// The main application widget
 class MyApp extends StatelessWidget {
-  // Using const constructor to make widget creation more efficient
-  const MyApp({Key? key}) : super(key: key);
+   const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'English Test App',
+      title: 'English Test App',  // アプリのタイトル
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        useMaterial3: true,
+        useMaterial3: true, 
       ),
-      home: LoginPage(),
+      home: LoginPage(),  // ホームページとしてLoginPageを指定
     );
   }
 }

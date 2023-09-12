@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:english_test_app/model/score_model.dart';
 
+// 書き取り問題ページ
 class DictationQuestionPage extends StatefulWidget {
   final ScoreModel scoreModel;
 
@@ -23,6 +24,7 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
   TextEditingController textController = TextEditingController();
   bool isAnswered = false;
 
+  // 音声を再生
   Future<void> playAudio(String storageUrl) async {
     try {
       final String downloadUrl =
@@ -33,6 +35,7 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
     }
   }
 
+  // Firestoreから質問を取得
   void fetchQuestion() async {
     try {
       final questionCollection =
@@ -48,12 +51,14 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
     }
   }
 
+  // 初期状態設定
   @override
   void initState() {
     super.initState();
     fetchQuestion();
   }
 
+  // 正解かどうかをチェック
   void checkAnswer(Question question) {
     if (!isAnswered) {
       isAnswered = true;
@@ -70,6 +75,7 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
     }
   }
 
+  // 次のページへ移動
   void navigateToNextPage() {
       Navigator.pushReplacement(
         context,
@@ -82,6 +88,7 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
       );
   }
 
+  // 次の質問に移動
   void goToNextQuestion() {
     setState(() {
       if (currentQuestionIndex >= questionList.length - 1) {
@@ -94,6 +101,7 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
     });
   }
 
+  // UI部分
   @override
   Widget build(BuildContext context) {
     if (questionList.isEmpty) {
@@ -112,19 +120,19 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (result != null) Text('Result: $result'),
+            if (result != null) Text('Result: $result'), // 結果表示
             SizedBox(height: 8),
-            const Text('音声を文字起こししてください'),
-            SizedBox(height: 8), 
+            const Text('音声を文字起こししてください'), // 指示
+            SizedBox(height: 8),
             TextButton(
               onPressed: () {
-                playAudio(question.audioUrl);
+                playAudio(question.audioUrl); // 音声再生
               },
               child: Text('Play Audio'),
             ),
             SizedBox(height: 8),
             TextField(
-              controller: textController,
+              controller: textController, // テキストフィールド
               decoration: InputDecoration(
                 hintText: '音声を文字起こししてください',
               ),
@@ -132,15 +140,15 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
             SizedBox(height: 8),
             ElevatedButton(
               onPressed: isAnswered ? null : () {
-                checkAnswer(question);
+                checkAnswer(question); // 答えをチェック
               },
               child: Text('Check Answer'),
             ),
             SizedBox(height: 8),
-            if (isAnswered) Text('Correct Answer: ${question.correctAnswer}'),
+            if (isAnswered) Text('Correct Answer: ${question.correctAnswer}'), // 正解表示
             if (isAnswered) SizedBox(height: 8),
             if (isAnswered) ElevatedButton(
-              onPressed: goToNextQuestion,
+              onPressed: goToNextQuestion, // 次の質問へ
               child: Text('Next Question'),
             ),
           ],
