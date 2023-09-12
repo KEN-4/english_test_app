@@ -1,16 +1,32 @@
-# english_test_app
+# 英語力診断アプリ
 
-A new Flutter project.
+## 説明
 
-## Getting Started
+このアプリは英語のテストを行い、その結果に応じておすすめの勉強方法を提案します。
 
-This project is a starting point for a Flutter application.
+## 作るに至った経緯
 
-A few resources to get you started if this is your first Flutter project:
+- 知り合いがアプリを作りたいと言っており、その要望を技術的に実現可能だと判断したため、開発を始めました。
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 使用技術
+
+- Flutter
+- Firebase
+
+### なぜFlutterにしたのか
+
+- アプリを作りたいとの要望があった。
+- 個人で開発する際に、Web、iOS、Androidで同じコードが動くFlutterを使用するのが最適だと判断。
+
+## 苦労した点
+
+- Flutterは比較的新しい言語で、情報が少ない。
+- アップデートが早く、過去の情報が多かった。
+
+## 改善予定
+
+- デザインの改善。
+- レコメンドの種類を増やす。
+- 関数を用いてコードを整理。
+- 問題ページをまとめる方法を探る。
