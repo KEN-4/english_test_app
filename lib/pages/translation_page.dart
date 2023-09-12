@@ -89,7 +89,7 @@ class _TranslationPageState extends State<TranslationPage> {
     var question = questionList[currentQuestionIndex];
     return Scaffold(
       appBar: AppBar(title: Text('Translation Test')),
-      body: Center(
+      body: SingleChildScrollView( // 画面が小さい時にスクロールできるようにする
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
