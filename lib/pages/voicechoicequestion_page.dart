@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:english_test_app/model/score_model.dart';
 
+// 4択の聞き取り問題ページ
 class VoiceChoiceQuestionPage extends StatefulWidget {
   const VoiceChoiceQuestionPage({Key? key, required this.title, required this.scoreModel}): super(key: key);
 
@@ -29,12 +30,14 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
     fetchQuestion();
   }
 
+  // 音声を再生
   Future<void> playAudio(String storageUrl) async {
     final String downloadUrl =
         await FirebaseStorage.instance.refFromURL(storageUrl).getDownloadURL();
     await audioPlayer.play(downloadUrl);
   }
 
+  // Firestoreから質問を取得
   Future<void> fetchQuestion() async {
     final questionCollection =
         await FirebaseFirestore.instance.collection('voicechoice').get();
@@ -46,6 +49,7 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
     setState(() {});
   }
 
+  // 次のページに遷移
   void navigateToNextPage() {
     Navigator.pushReplacement(
       context,
@@ -58,6 +62,7 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
     );
   }
 
+  // 次の問題に遷移
   void goToNextQuestion() {
     setState(() {
       if (currentQuestionIndex >= questionList.length - 1) {
@@ -70,6 +75,7 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
     });
   }
 
+  // 正解かどうかをチェック
   void checkAnswer(Question question, String selectedChoice) {
     if (!isAnswered) {
       isAnswered = true;
@@ -87,6 +93,7 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
     }
   }
 
+  // UI部分
   @override
   Widget build(BuildContext context) {
     if (questionList.isEmpty) {

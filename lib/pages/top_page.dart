@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class TopPage extends StatelessWidget {
   const TopPage({Key? key}) : super(key: key);
 
-  // Function to handle button press
+  // テスト開始ボタンが押されたときの処理
   void _onStartTestPressed(BuildContext context) {
     ScoreModel scoreModel = ScoreModel();
 

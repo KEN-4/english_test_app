@@ -4,6 +4,7 @@ import 'package:english_test_app/model/question_model.dart';
 import 'package:flutter/material.dart';
 import 'package:english_test_app/model/score_model.dart';
 
+// 翻訳問題ページ
 class TranslationPage extends StatefulWidget {
   const TranslationPage({Key? key, required this.title, required this.scoreModel})
       : super(key: key);
@@ -28,6 +29,7 @@ class _TranslationPageState extends State<TranslationPage> {
     fetchQuestion();
   }
 
+  // Firestoreから質問を取得
   void fetchQuestion() async {
     final questionCollection = await FirebaseFirestore.instance.collection('translation').get();
     final docs = questionCollection.docs;
@@ -38,6 +40,7 @@ class _TranslationPageState extends State<TranslationPage> {
     setState(() {});
   }
 
+  // 次のページに遷移
   void navigateToNextPage() {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
@@ -48,6 +51,7 @@ class _TranslationPageState extends State<TranslationPage> {
     );
   }
 
+  // 次の問題に遷移
   void goToNextQuestion() {
     setState(() {
       if (currentQuestionIndex >= questionList.length - 1) {
@@ -60,6 +64,8 @@ class _TranslationPageState extends State<TranslationPage> {
     });
   }
 
+
+  // 正解かどうかをチェック
   void checkAnswer(Question question) {
     if (!isAnswered) {
       isAnswered = true;
@@ -77,10 +83,12 @@ class _TranslationPageState extends State<TranslationPage> {
     }
   }
 
+  // テキストフィールドに選択肢を追加
   void addChoiceToTextField(String choice) {
     textController.text = textController.text + ' ' + choice;
   }
 
+  // UI部分
   @override
   Widget build(BuildContext context) {
     if (questionList.isEmpty) {

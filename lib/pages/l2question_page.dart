@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:english_test_app/model/score_model.dart';
 
+// 2択の聞き取り問題ページ
 class L2QuestionPage extends StatefulWidget {
   const L2QuestionPage({super.key, required this.title, required this.scoreModel});
 
@@ -23,6 +24,7 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
   int currentQuestionIndex = 0;
   String? result;
 
+  // 音声を再生
   Future<void> playAudio(String storageUrl) async {
     try {
       final String downloadUrl = await FirebaseStorage.instance.refFromURL(storageUrl).getDownloadURL();
@@ -32,6 +34,7 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
     }
   }
 
+  // Firestoreから質問を取得
   void fetchQuestion() async {
     final questionCollection = await FirebaseFirestore.instance.collection('listening_2choice').get();
     final docs = questionCollection.docs;
@@ -48,6 +51,7 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
     fetchQuestion();
   }
 
+  // 正解かどうかをチェック
   void checkAnswer(Question question, String selectedChoice) {
     if (!isAnswered) {
       isAnswered = true;
@@ -64,6 +68,7 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
     }
   }
 
+  // 次のページへ移動
   void goToNextQuestion() {
     setState(() {
       if (currentQuestionIndex >= questionList.length - 1) {
@@ -76,7 +81,7 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
     });
   }
 
-
+  // 次のページへ移動
   void navigateToNextPage() {
       Navigator.pushReplacement(
         context,
@@ -85,7 +90,8 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
         ),
       );
   }
-
+  
+  // UI部分
   @override
   Widget build(BuildContext context) {
     if (questionList.isEmpty) {

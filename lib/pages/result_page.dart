@@ -11,6 +11,7 @@ String capitalizeFirstLetter(String text) {
   return text[0].toUpperCase() + text.substring(1).toLowerCase();
 }
 
+// UIを構築するクラス
 class ResultPage extends StatelessWidget {
   final ScoreModel scoreModel;
 
@@ -62,6 +63,7 @@ class ResultPage extends StatelessWidget {
   }
 }
 
+// スコアからおすすめの学習方法を取得する
 List<String> getMostNeededStudyMethods(Map<String, double> scores) {
   List<String> lowestSkills = [];
   double lowestScore = 10.0;

@@ -4,6 +4,7 @@ import 'package:english_test_app/model/question_model.dart';
 import 'package:flutter/material.dart';
 import 'package:english_test_app/model/score_model.dart';
 
+//穴埋め問題ページ
 class FillBlankPage extends StatefulWidget {
   const FillBlankPage({Key? key, required this.title, required this.scoreModel})
       : super(key: key);
@@ -16,18 +17,19 @@ class FillBlankPage extends StatefulWidget {
 }
 
 class _FillBlankPageState extends State<FillBlankPage> {
-  List<Question> questionList = [];
-  int currentQuestionIndex = 0;
-  String? result;
-  TextEditingController textController = TextEditingController();
-  bool isAnswered = false;
+  List<Question> questionList = []; // 質問のリスト
+  int currentQuestionIndex = 0; // 現在の質問のインデックス
+  String? result; // 結果
+  TextEditingController textController = TextEditingController(); // テキストフィールドのコントローラー
+  bool isAnswered = false; // 回答済みかどうか
 
   @override
   void initState() {
     super.initState();
     fetchQuestions();
   }
-
+  
+  // Firestoreから質問を取得
   Future<void> fetchQuestions() async {
     try {
       final questionCollection =
@@ -41,6 +43,7 @@ class _FillBlankPageState extends State<FillBlankPage> {
     }
   }
 
+  // 正解かどうかをチェック
   void checkAnswer() {
     if (!isAnswered) {
       isAnswered = true;
@@ -58,6 +61,7 @@ class _FillBlankPageState extends State<FillBlankPage> {
     }
   }
 
+  // 次のページへ移動
   void navigateToNextPage() {
     Navigator.pushReplacement(
       context,
@@ -70,6 +74,7 @@ class _FillBlankPageState extends State<FillBlankPage> {
     );
   }
 
+  // 次の質問に移動
   void goToNextQuestion() {
     setState(() {
       if (currentQuestionIndex >= questionList.length - 1) {
@@ -82,6 +87,7 @@ class _FillBlankPageState extends State<FillBlankPage> {
     });
   }
 
+  // UI部分
   @override
   Widget build(BuildContext context) {
     if (questionList.isEmpty) {
@@ -100,7 +106,7 @@ class _FillBlankPageState extends State<FillBlankPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (result != null) Text('Result: $result'),
+            if (result != null) Text('Result: $result'), // 結果表示
             SizedBox(height: 8),
             Text('( )を埋めてください'),
             SizedBox(height: 8),
@@ -124,10 +130,10 @@ class _FillBlankPageState extends State<FillBlankPage> {
               child: Text('Check Answer'),
             ),
             SizedBox(height: 8),
-            if (isAnswered) Text('Example Answer: ${question.answers[0]}'),
+            if (isAnswered) Text('Example Answer: ${question.answers[0]}'), // 正解例表示
             if (isAnswered) SizedBox(height: 8),
             if (isAnswered) ElevatedButton(
-              onPressed: goToNextQuestion,
+              onPressed: goToNextQuestion, // 次へボタン
               child: Text('Next Question'),
             ),
           ],
