@@ -106,16 +106,16 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (result != null) Text('Result: $result'),
-            SizedBox(height: 8), // 追加
+            SizedBox(height: 8),
             const Text('音声に合う選択肢を選んでください'),
-            SizedBox(height: 8), // 追加
+            SizedBox(height: 8),
             TextButton(
               onPressed: () {
                 playAudio(question.audioUrl);
               },
               child: Text('Play Audio'),
             ),
-            SizedBox(height: 8), // 追加
+            SizedBox(height: 8),
             ...question.choices.map((choice) {
               return Column(
                 children: [
@@ -123,7 +123,7 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
                     onPressed: isAnswered ? null : () => checkAnswer(question, choice),
                     child: Text(choice),
                   ),
-                  SizedBox(height: 8), // 追加
+                  SizedBox(height: 8),
                 ],
               );
             }).toList(),
