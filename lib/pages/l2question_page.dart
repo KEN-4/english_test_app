@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:english_test_app/model/score_model.dart';
+import 'package:english_test_app/model/nextquestion_model.dart';
 
 // 2択の聞き取り問題ページ
 class L2QuestionPage extends StatefulWidget {
@@ -23,6 +24,7 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
   bool isAnswered = false;
   int currentQuestionIndex = 0;
   String? result;
+  NextQuestionModel nextQuestionModel = NextQuestionModel();
 
   // 音声を再生
   Future<void> playAudio(String storageUrl) async {
@@ -69,17 +71,14 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
   }
 
   // 次のページへ移動
-  void goToNextQuestion() {
-    setState(() {
-      if (currentQuestionIndex >= questionList.length - 1) {
-        navigateToNextPage();
-      } else {
-        isAnswered = false;
-        currentQuestionIndex++;
-        result = null;
-      }
-    });
-  }
+void goToNextQuestion() {
+  nextQuestionModel.goToNextQuestion(
+    questionList,
+    () => navigateToNextPage()
+  ); 
+  setState(() {});
+}
+
 
   // 次のページへ移動
   void navigateToNextPage() {
