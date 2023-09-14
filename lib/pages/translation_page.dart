@@ -3,6 +3,7 @@ import 'package:english_test_app/pages/choicequestion_page.dart';
 import 'package:english_test_app/model/question_model.dart';
 import 'package:flutter/material.dart';
 import 'package:english_test_app/model/score_model.dart';
+import 'package:english_test_app/model/nextquestion_model.dart';
 
 // 翻訳問題ページ
 class TranslationPage extends StatefulWidget {
@@ -17,11 +18,12 @@ class TranslationPage extends StatefulWidget {
 }
 
 class _TranslationPageState extends State<TranslationPage> {
-  List<Question> questionList = [];
-  int currentQuestionIndex = 0;
-  String? result;
-  TextEditingController textController = TextEditingController();
-  bool isAnswered = false;
+  List<Question> questionList = []; // 質問のリスト
+  int currentQuestionIndex = 0; // 現在の質問のインデックス
+  String? result; // 結果
+  TextEditingController textController = TextEditingController(); // テキストフィールドのコントローラー
+  bool isAnswered = false; // 回答済みかどうか
+  NextQuestionModel nextQuestionModel = NextQuestionModel(); // 次の質問に移動するためのモデル
 
   @override
   void initState() {
@@ -53,15 +55,13 @@ class _TranslationPageState extends State<TranslationPage> {
 
   // 次の問題に遷移
   void goToNextQuestion() {
-    setState(() {
-      if (currentQuestionIndex >= questionList.length - 1) {
-        navigateToNextPage();
-      } else {
-        isAnswered = false;
-        currentQuestionIndex++;
-        result = null;
-      }
-    });
+    nextQuestionModel.goToNextQuestion(
+      questionList,
+      currentQuestionIndex,
+      (val) => setState(() => isAnswered = val),
+      (val) => setState(() => currentQuestionIndex = val),
+      () => navigateToNextPage()
+    ); 
   }
 
 
