@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:english_test_app/model/score_model.dart';
+import 'package:english_test_app/model/nextquestion_model.dart';
 
 // 書き取り問題ページ
 class DictationQuestionPage extends StatefulWidget {
@@ -17,12 +18,13 @@ class DictationQuestionPage extends StatefulWidget {
 }
 
 class _DictationQuestionPageState extends State<DictationQuestionPage> {
-  List<Question> questionList = [];
-  AudioPlayer audioPlayer = AudioPlayer();
-  int currentQuestionIndex = 0;
-  String? result;
-  TextEditingController textController = TextEditingController();
-  bool isAnswered = false;
+  List<Question> questionList = []; // 質問のリスト
+  AudioPlayer audioPlayer = AudioPlayer(); // 音声プレイヤー
+  int currentQuestionIndex = 0; // 現在の質問のインデックス
+  String? result; // 結果
+  TextEditingController textController = TextEditingController(); // テキストフィールドのコントローラー
+  bool isAnswered = false; // 回答済みかどうか
+  NextQuestionModel nextQuestionModel = NextQuestionModel(); // 次の質問に移動するためのモデル
 
   // 音声を再生
   Future<void> playAudio(String storageUrl) async {
@@ -90,15 +92,13 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
 
   // 次の質問に移動
   void goToNextQuestion() {
-    setState(() {
-      if (currentQuestionIndex >= questionList.length - 1) {
-        navigateToNextPage();
-      } else {
-        isAnswered = false;
-        currentQuestionIndex++;
-        result = null;
-      }
-    });
+    nextQuestionModel.goToNextQuestion(
+      questionList,
+      currentQuestionIndex,
+      (val) => setState(() => isAnswered = val),
+      (val) => setState(() => currentQuestionIndex = val),
+      () => navigateToNextPage()
+    ); 
   }
 
   // UI部分

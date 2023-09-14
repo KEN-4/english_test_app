@@ -3,6 +3,7 @@ import 'package:english_test_app/pages/translation_page.dart';
 import 'package:english_test_app/model/question_model.dart';
 import 'package:flutter/material.dart';
 import 'package:english_test_app/model/score_model.dart';
+import 'package:english_test_app/model/nextquestion_model.dart';
 
 //穴埋め問題ページ
 class FillBlankPage extends StatefulWidget {
@@ -22,6 +23,7 @@ class _FillBlankPageState extends State<FillBlankPage> {
   String? result; // 結果
   TextEditingController textController = TextEditingController(); // テキストフィールドのコントローラー
   bool isAnswered = false; // 回答済みかどうか
+  NextQuestionModel nextQuestionModel = NextQuestionModel(); // 次の質問に移動するためのモデル
 
   @override
   void initState() {
@@ -76,15 +78,13 @@ class _FillBlankPageState extends State<FillBlankPage> {
 
   // 次の質問に移動
   void goToNextQuestion() {
-    setState(() {
-      if (currentQuestionIndex >= questionList.length - 1) {
-        navigateToNextPage();
-      } else {
-        isAnswered = false;
-        currentQuestionIndex++;
-        result = null;
-      }
-    });
+    nextQuestionModel.goToNextQuestion(
+      questionList,
+      currentQuestionIndex,
+      (val) => setState(() => isAnswered = val),
+      (val) => setState(() => currentQuestionIndex = val),
+      () => navigateToNextPage()
+    ); 
   }
 
   // UI部分

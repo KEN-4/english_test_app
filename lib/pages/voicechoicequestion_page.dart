@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:english_test_app/model/score_model.dart';
+import 'package:english_test_app/model/nextquestion_model.dart';
 
 // 4択の聞き取り問題ページ
 class VoiceChoiceQuestionPage extends StatefulWidget {
@@ -18,11 +19,12 @@ class VoiceChoiceQuestionPage extends StatefulWidget {
 }
 
 class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
-  List<Question> questionList = [];
-  AudioPlayer audioPlayer = AudioPlayer();
-  int currentQuestionIndex = 0;
-  String? result;
-  bool isAnswered = false;
+  List<Question> questionList = []; // 質問のリスト
+  AudioPlayer audioPlayer = AudioPlayer(); // 音声プレイヤー
+  int currentQuestionIndex = 0; // 現在の質問のインデックス
+  String? result; // 結果
+  bool isAnswered = false; // 回答済みかどうか
+  NextQuestionModel nextQuestionModel = NextQuestionModel(); // 次の質問に移動するためのモデル
 
   @override
   void initState() {
@@ -64,15 +66,13 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
 
   // 次の問題に遷移
   void goToNextQuestion() {
-    setState(() {
-      if (currentQuestionIndex >= questionList.length - 1) {
-        navigateToNextPage();
-      } else {
-        isAnswered = false;
-        currentQuestionIndex++;
-        result = null;
-      }
-    });
+    nextQuestionModel.goToNextQuestion(
+      questionList,
+      currentQuestionIndex,
+      (val) => setState(() => isAnswered = val),
+      (val) => setState(() => currentQuestionIndex = val),
+      () => navigateToNextPage()
+    ); 
   }
 
   // 正解かどうかをチェック

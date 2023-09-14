@@ -3,6 +3,7 @@ import 'package:english_test_app/pages/fillintheblank_page.dart';
 import 'package:english_test_app/model/question_model.dart';
 import 'package:flutter/material.dart';
 import 'package:english_test_app/model/score_model.dart';
+import 'package:english_test_app/model/nextquestion_model.dart';
 
 // 会話問題ページ
 class ConversationQuestionPage extends StatefulWidget {
@@ -20,6 +21,7 @@ class _ConversationQuestionPageState extends State<ConversationQuestionPage> {
   int currentQuestionIndex = 0;  // 現在の質問のインデックス
   String? result;  // 結果
   bool isAnswered = false;  // 回答済みかどうか
+  NextQuestionModel nextQuestionModel = NextQuestionModel();  // 次の質問に移動するためのモデル
 
   // 初期状態設定
   @override
@@ -54,15 +56,13 @@ class _ConversationQuestionPageState extends State<ConversationQuestionPage> {
 
   // 次の質問に移動
   void goToNextQuestion() {
-    setState(() {
-      if (currentQuestionIndex >= questionList.length - 1) {
-        navigateToNextPage();
-      } else {
-        isAnswered = false;
-        currentQuestionIndex++;
-        result = null;
-      }
-    });
+    nextQuestionModel.goToNextQuestion(
+      questionList,
+      currentQuestionIndex,
+      (val) => setState(() => isAnswered = val),
+      (val) => setState(() => currentQuestionIndex = val),
+      () => navigateToNextPage()
+    ); 
   }
 
   // 正解かどうかをチェック

@@ -1,17 +1,12 @@
 import 'package:english_test_app/model/question_model.dart';
 
 class NextQuestionModel {
-  int currentQuestionIndex = 0;
-  bool isAnswered = false;
-  String? result;
-
-  void goToNextQuestion(List<Question> questionList, Function navigateToNextPage) {
+  void goToNextQuestion(List<Question> questionList, int currentQuestionIndex, Function setIsAnswered, Function setCurrentQuestionIndex, Function navigateToNextPage) {
     if (currentQuestionIndex >= questionList.length - 1) {
       navigateToNextPage();
     } else {
-      isAnswered = false;
-      currentQuestionIndex++;
-      result = null;
+      setIsAnswered(false);
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   }
 }

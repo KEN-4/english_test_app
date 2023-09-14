@@ -3,6 +3,7 @@ import 'package:english_test_app/pages/result_page.dart';
 import 'package:english_test_app/model/question_model.dart';
 import 'package:flutter/material.dart';
 import 'package:english_test_app/model/score_model.dart';
+import 'package:english_test_app/model/nextquestion_model.dart';
 
 // 4択の問題ページ
 class ChoiceQuestionPage extends StatefulWidget {
@@ -20,6 +21,7 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
   int currentQuestionIndex = 0;  // 現在の質問のインデックス
   String? result;  // 結果
   bool isAnswered = false;  // 回答済みかどうか
+  NextQuestionModel nextQuestionModel = NextQuestionModel();  // 次の質問に移動するためのモデル
   
   // Firestoreから質問を取得
   void fetchQuestion() async {
@@ -51,15 +53,13 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
 
   // 次の質問に移動
   void goToNextQuestion() {
-    setState(() {
-      if (currentQuestionIndex >= questionList.length - 1) {
-        navigateToResultPage();
-      } else {
-        isAnswered = false;
-        currentQuestionIndex++;
-        result = null;
-      }
-    });
+    nextQuestionModel.goToNextQuestion(
+      questionList,
+      currentQuestionIndex,
+      (val) => setState(() => isAnswered = val),
+      (val) => setState(() => currentQuestionIndex = val),
+      () => navigateToResultPage()
+    ); 
   }
 
   // 正解かどうかをチェック
