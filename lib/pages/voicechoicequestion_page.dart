@@ -112,7 +112,7 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (result != null) Text('Result: $result'),
+            if (isAnswered) Text('Result: $result'),
             SizedBox(height: 8),
             const Text('音声に合う選択肢を選んでください'),
             SizedBox(height: 8),

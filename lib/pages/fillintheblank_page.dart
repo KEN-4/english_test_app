@@ -106,7 +106,7 @@ class _FillBlankPageState extends State<FillBlankPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (result != null) Text('Result: $result'), // 結果表示
+            if (isAnswered) Text('Result: $result'), // 結果表示
             SizedBox(height: 8),
             Text('( )を埋めてください'),
             SizedBox(height: 8),

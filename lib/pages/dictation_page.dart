@@ -120,7 +120,7 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (result != null) Text('Result: $result'), // 結果表示
+            if (isAnswered) Text('Result: $result'), // 結果表示
             SizedBox(height: 8),
             const Text('音声を文字起こししてください'), // 指示
             SizedBox(height: 8),

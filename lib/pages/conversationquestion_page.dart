@@ -94,7 +94,7 @@ class _ConversationQuestionPageState extends State<ConversationQuestionPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (result != null) Text('Result: $result'),  // 結果表示
+            if (isAnswered) Text('Result: $result'),  // 結果表示
             SizedBox(height: 8),
             const Text('会話文の続きを選んでください'),  // 指示文
             SizedBox(height: 8),

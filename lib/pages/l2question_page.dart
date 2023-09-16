@@ -112,7 +112,7 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (result != null) Text('Result: $result'),
+            if (isAnswered) Text('Result: $result'),
             SizedBox(height: 8),
             const Text('発音した単語を選んでください'),
             SizedBox(height: 8),
