@@ -91,7 +91,7 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (result != null) Text('Result: $result'),  // 結果表示
+            if (isAnswered) Text('Result: $result'),  // 結果表示
             SizedBox(height: 8),
             const Text('( )に当てはまる物を選んでください'),
             SizedBox(height: 8),

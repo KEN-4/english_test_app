@@ -101,7 +101,7 @@ class _TranslationPageState extends State<TranslationPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (result != null) Text('Result: $result'),
+            if (isAnswered) Text('Result: $result'),
             SizedBox(height: 8),
             const Text('日本語の文を英文に訳してください'),
             SizedBox(height: 8),
