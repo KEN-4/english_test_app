@@ -13,4 +13,7 @@ class ScoreModel {
     scores[skill] = (scores[skill] ?? 0.0) + additionalScore;
     print("Score for $skill after adding: ${scores[skill]}");
   }
+  Map<String, dynamic> toMap() {
+    return scores;
+  }
 }

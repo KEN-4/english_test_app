@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:english_test_app/pages/top_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:english_test_app/model/score_model.dart';
 
 // ログイン画面用Widget
 class LoginPage extends StatefulWidget {
@@ -61,6 +63,23 @@ class _LoginPageState extends State<LoginPage> {
                         email: email,
                         password: password,
                       );
+                      // ユーザー情報をFirestoreに保存
+                      final user = result.user;
+                      if (user != null) {
+                        final uid = user.uid;
+                        ScoreModel scoreModel = ScoreModel();
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(uid)
+                            .set({
+                          'email': email,
+                          'createdAt': Timestamp.now(),
+                          'scores': scoreModel.toMap(),
+                        });
+                      } else {
+                        // userがnullである場合の処理
+                        print("user is null");
+                      }
                       // ユーザー登録に成功した場合
                       // チャット画面に遷移＋ログイン画面を破棄
                       await Navigator.of(context).pushReplacement(
