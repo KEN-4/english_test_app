@@ -3,23 +3,37 @@ import 'package:english_test_app/model/score_model.dart';
 import 'package:english_test_app/pages/login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-String capitalizeFirstLetter(String text) {
-  if (text == null || text.isEmpty) {
-    return text;
-  }
-  return text[0].toUpperCase() + text.substring(1).toLowerCase();
-}
-
-// UIを構築するクラス
-class ResultPage extends StatelessWidget {
+class ResultPage extends StatefulWidget {
   final ScoreModel scoreModel;
 
   ResultPage({required this.scoreModel});
 
   @override
+  _ResultPageState createState() => _ResultPageState();
+}
+
+class _ResultPageState extends State<ResultPage> {
+  @override
+  void initState() {
+    super.initState();
+    _saveResultsToFirestore();
+  }
+
+  Future<void> _saveResultsToFirestore() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final uid = user.uid;
+      await FirebaseFirestore.instance.collection('users').doc(uid).update({
+        'result_scores': widget.scoreModel.scores,
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    List<String> recommendations = getMostNeededStudyMethods(scoreModel.scores);
+    List<String> recommendations = getMostNeededStudyMethods(widget.scoreModel.scores);
 
     return Scaffold(
       body: Center(
@@ -30,7 +44,7 @@ class ResultPage extends StatelessWidget {
               'スコア',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            ...scoreModel.scores.entries.map(
+            ...widget.scoreModel.scores.entries.map(
               (e) => Text('${capitalizeFirstLetter(e.key)}: ${e.value}'),
             ),
             SizedBox(height: 20),
@@ -61,6 +75,13 @@ class ResultPage extends StatelessWidget {
       ),
     );
   }
+}
+
+String capitalizeFirstLetter(String text) {
+  if (text == null || text.isEmpty) {
+    return text;
+  }
+  return text[0].toUpperCase() + text.substring(1).toLowerCase();
 }
 
 // スコアからおすすめの学習方法を取得する
