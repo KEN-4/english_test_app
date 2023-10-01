@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:english_test_app/model/recommend_model.dart';
 import 'package:english_test_app/model/score_model.dart';
 import 'package:english_test_app/pages/login_page.dart';
@@ -13,39 +12,14 @@ String capitalizeFirstLetter(String text) {
 }
 
 // UIを構築するクラス
-class ResultPage extends StatefulWidget {
+class ResultPage extends StatelessWidget {
   final ScoreModel scoreModel;
 
   ResultPage({required this.scoreModel});
 
   @override
-  _ResultPageState createState() => _ResultPageState();
-}
-
-class _ResultPageState extends State<ResultPage> {
-  @override
-  void initState() {
-    super.initState();
-    _saveScoresToFirestore(widget.scoreModel.scores);
-  }
-
-  Future<void> _saveScoresToFirestore(Map<String, double> scores) async {
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (user != null) {
-      final uid = user.uid;
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .update({
-        'scores': scores,
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    List<String> recommendations = getMostNeededStudyMethods(widget.scoreModel.scores);
+    List<String> recommendations = getMostNeededStudyMethods(scoreModel.scores);
 
     return Scaffold(
       body: Center(
@@ -56,7 +30,7 @@ class _ResultPageState extends State<ResultPage> {
               'スコア',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            ...widget.scoreModel.scores.entries.map(
+            ...scoreModel.scores.entries.map(
               (e) => Text('${capitalizeFirstLetter(e.key)}: ${e.value}'),
             ),
             SizedBox(height: 20),

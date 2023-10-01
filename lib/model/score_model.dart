@@ -8,19 +8,9 @@ class ScoreModel {
     'vocabulary': 0.0,
   };
 
-  ScoreModel();
-  
-  // MapからScoreModelを生成
-  ScoreModel.fromMap(Map<String, dynamic> map) {
-    this.scores = map.map((key, value) => MapEntry(key, value as double));
-  }
-
   // 指定されたスキルのスコアを加算
   void addScore(String skill, {double additionalScore = 1.0}) {
     scores[skill] = (scores[skill] ?? 0.0) + additionalScore;
     print("Score for $skill after adding: ${scores[skill]}");
-  }
-  Map<String, dynamic> toMap() {
-    return scores;
   }
 }

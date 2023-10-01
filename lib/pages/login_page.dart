@@ -1,9 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:english_test_app/pages/result_page.dart';
 import 'package:english_test_app/pages/top_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:english_test_app/model/score_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 // ログイン画面用Widget
 class LoginPage extends StatefulWidget {
@@ -17,25 +15,6 @@ class _LoginPageState extends State<LoginPage> {
   // 入力したメールアドレス・パスワード
   String email = '';
   String password = '';
-  Future<ScoreModel> _fetchScoresFromFirestore() async {
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (user != null) {
-      final uid = user.uid;
-      final doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .get();
-
-      if (doc.exists) {
-        final Map<String, dynamic>? data = doc.data();
-        if (data != null && data.containsKey('scores')) {
-          return ScoreModel.fromMap(data['scores'] as Map<String, dynamic>);
-        }
-      }
-    }
-    return ScoreModel();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,25 +62,19 @@ class _LoginPageState extends State<LoginPage> {
                         email: email,
                         password: password,
                       );
-                      // ユーザー情報をFirestoreに保存
-                      final user = result.user;
-                      if (user != null) {
-                        final uid = user.uid;
-                        ScoreModel scoreModel = ScoreModel();
-                        await FirebaseFirestore.instance
-                            .collection('users')
-                            .doc(uid)
-                            .set({
-                          'email': email,
-                          'createdAt': Timestamp.now(),
-                          'scores': scoreModel.toMap(),
-                        });
-                      } else {
-                        // userがnullである場合の処理
-                        print("user is null");
-                      }
+                      // Firestoreにデータを保存
+                      final uid = result.user!.uid;
+                      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+                        'createdAt': Timestamp.now(),
+                        'email': email,
+                        'result_scores':{
+                          'grammar': 0,
+                          'listening': 0,
+                          'speaking': 0,
+                          'vocabulary': 0,
+                        },  
+                      });
                       // ユーザー登録に成功した場合
-                      // チャット画面に遷移＋ログイン画面を破棄
                       await Navigator.of(context).pushReplacement(
                         MaterialPageRoute(builder: (context) {
                           return TopPage();
@@ -130,42 +103,20 @@ class _LoginPageState extends State<LoginPage> {
                         email: email,
                         password: password,
                       );
+                      // Firestoreからデータを読み込む
+                      final uid = result.user!.uid;
+                      final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+                      if (doc.exists) {
+                        Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
+                        if (data != null && data.containsKey('result_scores')) {
+                          Map<String, dynamic> scores = data['result_scores'];
+                        }
+                      }
                       // ログインに成功した場合
-                      // 問題画面に遷移＋ログイン画面を破棄
                       await Navigator.of(context).pushReplacement(
                         MaterialPageRoute(builder: (context) {
                           return TopPage();
-                        }),
-                      );
-                    } catch (e) {
-                      // ログインに失敗した場合
-                      setState(() {
-                        infoText = "ログインに失敗しました：${e.toString()}";
-                      });
-                    }
-                  },
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                // 前回の結果を見るボタン
-                child: OutlinedButton(
-                  child: Text('前回の結果を見る'),
-                  onPressed: () async {
-                    try {
-                      // 前回の結果を取得
-                      final scoreModel = await _fetchScoresFromFirestore();
-                      // メール/パスワードでログイン
-                      final FirebaseAuth auth = FirebaseAuth.instance;
-                      final result = await auth.signInWithEmailAndPassword(
-                        email: email,
-                        password: password,
-                      );
-                      // ログインに成功した場合
-                      // 結果画面に遷移＋ログイン画面を破棄
-                      await Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) {
-                          return ResultPage(scoreModel: scoreModel);
                         }),
                       );
                     } catch (e) {
