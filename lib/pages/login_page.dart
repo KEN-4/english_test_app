@@ -1,6 +1,7 @@
 import 'package:english_test_app/pages/top_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 // ログイン画面用Widget
 class LoginPage extends StatefulWidget {
@@ -26,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
             children: <Widget>[
               // メールアドレス入力
               TextFormField(
-                decoration: InputDecoration(labelText: 'メールアドレス'),
+                decoration: const InputDecoration(labelText: 'メールアドレス'),
                 onChanged: (String value) {
                   setState(() {
                     email = value;
@@ -35,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               // パスワード入力
               TextFormField(
-                decoration: InputDecoration(labelText: 'パスワード'),
+                decoration: const InputDecoration(labelText: 'パスワード'),
                 obscureText: true,
                 onChanged: (String value) {
                   setState(() {
@@ -44,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
                 },
               ),
               Container(
-                padding: EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
                 // メッセージ表示
                 child: Text(infoText),
               ),
@@ -61,11 +62,22 @@ class _LoginPageState extends State<LoginPage> {
                         email: email,
                         password: password,
                       );
+                      // Firestoreにデータを保存
+                      final uid = result.user!.uid;
+                      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+                        'createdAt': Timestamp.now(),
+                        'email': email,
+                        'result_scores':{
+                          'grammar': 0,
+                          'listening': 0,
+                          'speaking': 0,
+                          'vocabulary': 0,
+                        },  
+                      });
                       // ユーザー登録に成功した場合
-                      // チャット画面に遷移＋ログイン画面を破棄
                       await Navigator.of(context).pushReplacement(
                         MaterialPageRoute(builder: (context) {
-                          return TopPage();
+                          return TopPage(isNewUser: true);
                         }),
                       );
                     } catch (e) {
@@ -82,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                 width: double.infinity,
                 // ログイン登録ボタン
                 child: OutlinedButton(
-                  child: Text('ログイン'),
+                  child: const Text('ログイン'),
                   onPressed: () async {
                     try {
                       // メール/パスワードでログイン
@@ -91,11 +103,20 @@ class _LoginPageState extends State<LoginPage> {
                         email: email,
                         password: password,
                       );
+                      // Firestoreからデータを読み込む
+                      final uid = result.user!.uid;
+                      final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+                      if (doc.exists) {
+                        Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
+                        if (data != null && data.containsKey('result_scores')) {
+                          Map<String, dynamic> scores = data['result_scores'];
+                        }
+                      }
                       // ログインに成功した場合
-                      // チャット画面に遷移＋ログイン画面を破棄
                       await Navigator.of(context).pushReplacement(
                         MaterialPageRoute(builder: (context) {
-                          return TopPage();
+                          return TopPage(isNewUser: false);
                         }),
                       );
                     } catch (e) {
