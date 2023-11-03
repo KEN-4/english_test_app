@@ -64,7 +64,7 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
   void checkAnswer(Question question) {
     if (!isAnswered) {
       isAnswered = true;
-      if (question.correctAnswer == textController.text.trim()) {
+      if (question.answers.contains(textController.text.trim())) {
         result = '○';
         for (String skill in question.skills) {
           widget.scoreModel.addScore(skill, additionalScore: question.score);
@@ -145,7 +145,7 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
               child: Text('Check Answer'),
             ),
             SizedBox(height: 8),
-            if (isAnswered) Text('Correct Answer: ${question.correctAnswer}'), // 正解表示
+            if (isAnswered) Text('Correct Answer: ${question.answers[0]}'), // 正解表示
             if (isAnswered) SizedBox(height: 8),
             if (isAnswered) ElevatedButton(
               onPressed: goToNextQuestion, // 次の質問へ
