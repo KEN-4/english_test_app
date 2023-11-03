@@ -24,6 +24,8 @@ class _TranslationPageState extends State<TranslationPage> {
   TextEditingController textController = TextEditingController(); // テキストフィールドのコントローラー
   bool isAnswered = false; // 回答済みかどうか
   NextQuestionModel nextQuestionModel = NextQuestionModel(); // 次の質問に移動するためのモデル
+  List<String> choicesMade = []; // ユーザーの選択を追跡するリスト
+
 
   @override
   void initState() {
@@ -83,10 +85,32 @@ class _TranslationPageState extends State<TranslationPage> {
     }
   }
 
-  // テキストフィールドに選択肢を追加
+  // 選択を追加する関数
   void addChoiceToTextField(String choice) {
-    textController.text = textController.text + ' ' + choice;
+    setState(() {
+      choicesMade.add(choice); // 選択をリストに追加
+      textController.text = choicesMade.join(' '); // リストの内容をテキストフィールドに表示
+    });
   }
+
+  // 最後の選択を取り消す関数
+  void removeLastChoice() {
+    if (choicesMade.isNotEmpty) {
+      setState(() {
+        choicesMade.removeLast(); // リストの最後の要素を削除
+        textController.text = choicesMade.join(' '); // 更新されたリストの内容をテキストフィールドに表示
+      });
+    }
+  }
+
+  // 選択肢のリストをクリアする関数
+  void clearChoices() {
+    setState(() {
+      choicesMade.clear(); // リストをクリア
+      textController.clear(); // テキストフィールドをクリア
+    });
+  }
+
 
   // UI部分
   @override
@@ -120,6 +144,15 @@ class _TranslationPageState extends State<TranslationPage> {
                 SizedBox(height: 8),
               ],
             )),
+            ElevatedButton(
+              onPressed: removeLastChoice,
+              child: Text('Remove Last Choice'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white, 
+              ),  
+            ),
+            SizedBox(height: 8),
             TextField(
               controller: textController,
               decoration: InputDecoration(
@@ -135,12 +168,12 @@ class _TranslationPageState extends State<TranslationPage> {
             ),
             SizedBox(height: 8),
             ElevatedButton(
-              onPressed: () => textController.clear(),
+              onPressed: () => clearChoices(),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
               ),
-              child: Text('Clear'),
+              child: Text('Clear All Text'),
             ),
             SizedBox(height: 8),
             if (isAnswered) Text('Correct Answer: ${question.correctAnswer}'),
