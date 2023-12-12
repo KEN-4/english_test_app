@@ -31,11 +31,13 @@ class _DictationQuestionPageState extends State<DictationQuestionPage> {
     try {
       final String downloadUrl =
           await FirebaseStorage.instance.refFromURL(storageUrl).getDownloadURL();
-      await audioPlayer.play(downloadUrl);
+      await audioPlayer.setSource(UrlSource(downloadUrl));
+      await audioPlayer.resume(); // この行を追加
     } catch (e) {
       print("Error while playing audio: $e");
     }
   }
+
 
   // Firestoreから質問を取得
   void fetchQuestion() async {

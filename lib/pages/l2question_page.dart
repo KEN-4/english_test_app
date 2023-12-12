@@ -29,8 +29,10 @@ class _L2QuestionPageState extends State<L2QuestionPage> {
   // 音声を再生
   Future<void> playAudio(String storageUrl) async {
     try {
-      final String downloadUrl = await FirebaseStorage.instance.refFromURL(storageUrl).getDownloadURL();
-      await audioPlayer.play(downloadUrl);
+      final String downloadUrl =
+          await FirebaseStorage.instance.refFromURL(storageUrl).getDownloadURL();
+      await audioPlayer.setSource(UrlSource(downloadUrl));
+      await audioPlayer.resume(); // この行を追加
     } catch (e) {
       print("Error while playing audio: $e");
     }
