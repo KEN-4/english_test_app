@@ -34,9 +34,14 @@ class _VoiceChoiceQuestionPageState extends State<VoiceChoiceQuestionPage> {
 
   // 音声を再生
   Future<void> playAudio(String storageUrl) async {
-    final String downloadUrl =
-        await FirebaseStorage.instance.refFromURL(storageUrl).getDownloadURL();
-    await audioPlayer.play(downloadUrl);
+    try {
+      final String downloadUrl =
+          await FirebaseStorage.instance.refFromURL(storageUrl).getDownloadURL();
+      await audioPlayer.setSource(UrlSource(downloadUrl));
+      await audioPlayer.resume(); // この行を追加
+    } catch (e) {
+      print("Error while playing audio: $e");
+    }
   }
 
   // Firestoreから質問を取得
