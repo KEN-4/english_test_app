@@ -1,6 +1,6 @@
 import 'package:english_test_app/pages/login_page.dart';
 import 'package:english_test_app/firebase_options.dart';
-import 'package:english_test_app/pages/test_page.dart';
+import 'package:english_test_app/test/test_login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true, 
       ),
-      home: isTestMode ? TestPage() : LoginPage(),  // テストモードに基づいて表示するページを変更
+      home: isTestMode ? TestLoginPage() : LoginPage(),  // テストモードに基づいて表示するページを変更
     );
   }
 }
