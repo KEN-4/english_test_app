@@ -1,5 +1,6 @@
 import 'package:english_test_app/pages/login_page.dart';
 import 'package:english_test_app/firebase_options.dart';
+import 'package:english_test_app/pages/test_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -12,12 +13,17 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // テストモードのフラグ
+  bool isTestMode = true; // テストモードを有効にするにはtrueに設定
+
   // アプリを起動
-  runApp(const MyApp());
+  runApp(MyApp(isTestMode: isTestMode));
 }
 
 class MyApp extends StatelessWidget {
-   const MyApp({Key? key}) : super(key: key);
+  final bool isTestMode;
+
+  const MyApp({Key? key, required this.isTestMode}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +33,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true, 
       ),
-      home: LoginPage(),  // ホームページとしてLoginPageを指定
+      home: isTestMode ? TestPage() : LoginPage(),  // テストモードに基づいて表示するページを変更
     );
   }
 }
