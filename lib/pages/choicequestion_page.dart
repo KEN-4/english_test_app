@@ -23,22 +23,25 @@ class _ChoiceQuestionPageState extends State<ChoiceQuestionPage> {
   bool isAnswered = false;  // 回答済みかどうか
   NextQuestionModel nextQuestionModel = NextQuestionModel();  // 次の質問に移動するためのモデル
   
-  // Firestoreから質問を取得
+  // Firestoreから特定タイプの質問を取得
   void fetchQuestion() async {
-    final questionCollection = await FirebaseFirestore.instance.collection('choice').get();
-    final docs = questionCollection.docs;
-    for (var doc in docs) {
-      Question question = Question.fromMap(doc.data());
-      questionList.add(question);
-    }
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    QuerySnapshot snapshot = await firestore
+        .collection('question')
+        .where('type', isEqualTo: 'choice') // ここでフィルタリング
+        .get();
+
+    questionList = snapshot.docs
+        .map((doc) => Question.fromMap(doc.data() as Map<String, dynamic>))
+        .toList();
+    
     setState(() {});
   }
 
-  // 初期状態設定
   @override
   void initState() {
     super.initState();
-    fetchQuestion();
+    fetchQuestion(); // 質問データを取得
   }
 
   // 結果ページに移動

@@ -27,21 +27,25 @@ class _TranslationPageState extends State<TranslationPage> {
   List<String> choicesMade = []; // ユーザーの選択を追跡するリスト
 
 
+  // Firestoreから特定タイプの質問を取得
+  void fetchQuestion() async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    QuerySnapshot snapshot = await firestore
+        .collection('question')
+        .where('type', isEqualTo: 'translation') // ここでフィルタリング
+        .get();
+
+    questionList = snapshot.docs
+        .map((doc) => Question.fromMap(doc.data() as Map<String, dynamic>))
+        .toList();
+    
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
-    fetchQuestion();
-  }
-
-  // Firestoreから質問を取得
-  void fetchQuestion() async {
-    final questionCollection = await FirebaseFirestore.instance.collection('translation').get();
-    final docs = questionCollection.docs;
-    for (var doc in docs) {
-      Question question = Question.fromMap(doc.data());
-      questionList.add(question);
-    }
-    setState(() {});
+    fetchQuestion(); // 質問データを取得
   }
 
   // 次のページに遷移

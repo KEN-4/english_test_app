@@ -23,22 +23,25 @@ class _ConversationQuestionPageState extends State<ConversationQuestionPage> {
   bool isAnswered = false;  // 回答済みかどうか
   NextQuestionModel nextQuestionModel = NextQuestionModel();  // 次の質問に移動するためのモデル
 
-  // 初期状態設定
+  // Firestoreから特定タイプの質問を取得
+  void fetchQuestion() async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    QuerySnapshot snapshot = await firestore
+        .collection('question')
+        .where('type', isEqualTo: 'conversation') // ここでフィルタリング
+        .get();
+
+    questionList = snapshot.docs
+        .map((doc) => Question.fromMap(doc.data() as Map<String, dynamic>))
+        .toList();
+    
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
-    fetchQuestion();
-  }
-
-  // Firestoreから質問を取得
-  void fetchQuestion() async {
-    final questionCollection = await FirebaseFirestore.instance.collection('conversation').get();
-    final docs = questionCollection.docs;
-    for (var doc in docs) {
-      Question question = Question.fromMap(doc.data());
-      questionList.add(question);
-    }
-    setState(() {});
+    fetchQuestion(); // 質問データを取得
   }
 
   // 次のページへ移動
