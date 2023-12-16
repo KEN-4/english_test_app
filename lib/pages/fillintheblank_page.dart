@@ -25,24 +25,25 @@ class _FillBlankPageState extends State<FillBlankPage> {
   bool isAnswered = false; // 回答済みかどうか
   NextQuestionModel nextQuestionModel = NextQuestionModel(); // 次の質問に移動するためのモデル
 
+  // Firestoreから特定タイプの質問を取得
+  void fetchQuestion() async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    QuerySnapshot snapshot = await firestore
+        .collection('question')
+        .where('type', isEqualTo: 'fill_in_the_blank') // ここでフィルタリング
+        .get();
+
+    questionList = snapshot.docs
+        .map((doc) => Question.fromMap(doc.data() as Map<String, dynamic>))
+        .toList();
+    
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
-    fetchQuestions();
-  }
-  
-  // Firestoreから質問を取得
-  Future<void> fetchQuestions() async {
-    try {
-      final questionCollection =
-          await FirebaseFirestore.instance.collection('fillintheblank').get();
-      questionList = questionCollection.docs
-          .map((doc) => Question.fromMap(doc.data()))
-          .toList();
-      setState(() {});
-    } catch (e) {
-      print("Error while fetching questions: $e");
-    }
+    fetchQuestion(); // 質問データを取得
   }
 
   // 正解かどうかをチェック

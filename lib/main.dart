@@ -14,7 +14,7 @@ void main() async {
   );
 
   // テストモードのフラグ
-  bool isTestMode = true; // テストモードを有効にするにはtrueに設定
+  bool isTestMode = false; // テストモードを有効にするにはtrueに設定
 
   // アプリを起動
   runApp(MyApp(isTestMode: isTestMode));
